@@ -5,6 +5,7 @@
 #include "tuple_alt.h"
 #include "templates_args.h"
 #include "templates_spec.h"
+#include "check_type_expr.h"
 
 int main(void)
 {
@@ -22,6 +23,9 @@ int main(void)
 
     std::cout << "\n--------- templates_spec::test()"  << "\n";
     templates_spec::test();
+
+    std::cout << "\n--------- check_type_expr::test()"  << "\n";
+    check_type_expr::test();
 
     return 0;
 }
