@@ -6,6 +6,7 @@
 #include "templates_args.h"
 #include "templates_spec.h"
 #include "check_type_expr.h"
+#include "meta_list.h"
 
 int main(void)
 {
@@ -26,6 +27,9 @@ int main(void)
 
     std::cout << "\n--------- check_type_expr::test()"  << "\n";
     check_type_expr::test();
+
+    std::cout << "\n--------- meta_list::test()"  << "\n";
+    meta_list::test();
 
     return 0;
 }
