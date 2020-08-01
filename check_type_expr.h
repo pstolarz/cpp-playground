@@ -7,6 +7,7 @@ namespace check_type_expr {
 
 template<typename T, typename...> using T_alias = T;
 template <typename...> using void_alias = T_alias<void>;
+template <typename...> using int_alias = T_alias<int>;
 
 /* chk_spec<T, (T2)>; T2 is assumed to be always void therefore set as default */
 template <class T, class = void>
@@ -27,21 +28,18 @@ struct chk_spec<T, void_alias<void>> {
 };
 */
 
-template <typename...> using long_alias = T_alias<long>;
-template <typename...> using int_alias = T_alias<int>;
-
 template<bool V>
 struct chk_result {
     static constexpr auto value = V;
 };
 
 template<typename T>
-chk_result<false> chk_sfinae_f(long_alias<T>);
+chk_result<false> chk_sfinae_f(...);
 
 template<typename T>
 chk_result<true> chk_sfinae_f(int_alias<T_EXPR(T)>);
 
-/* check chk_sfinae_f(int) first, fall-back to chk_sfinae_f(long) in case of failure */
+/* check chk_sfinae_f(int) first, fall-back to chk_sfinae_f(...) in case of failure */
 template<typename T>
 auto chk_sfinae = decltype(chk_sfinae_f<T>(0))::value;
 
