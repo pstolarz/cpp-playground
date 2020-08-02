@@ -1,6 +1,8 @@
 #ifndef __TUPLE_ALT_H__
 #define __TUPLE_ALT_H__
 
+#include <utility>  // std::integer_sequence
+
 namespace tuple_alt {
 
 template<size_t index, class Head, class ...Tail>
@@ -50,7 +52,7 @@ struct _Tuple<index, Head>
             nullptr);
     }
 
-    static const size_t size = index+1;
+    static constexpr size_t size = index+1;
 };
 
 template<class ...List>
@@ -77,19 +79,26 @@ struct TupleTrait<0, Tuple>
 template<size_t n, class Tuple>
 auto&& get_elem(Tuple& t)
 {
-    static_assert(n >= 0 && n < t.size, "Invalid depth");
+    static_assert(n >= 0 && n < Tuple::size, "Invalid depth");
     return *reinterpret_cast<typename TupleTrait<n, Tuple>::elem_type*>(
         t.get_elem_addr(n));
 }
 
-template<size_t ...Indexes, class Tuple>
-void _print_elems(Tuple& t) {
-    auto l = {(std::cout << get_elem<Indexes>(t) << "\n", 0)...};
-}
+template<class Seq>
+struct _print_elems;
+
+template<std::size_t ...Indexes>
+struct _print_elems<std::integer_sequence<std::size_t, Indexes...>>
+{
+    template<class Tuple>
+    static void print(Tuple& t) {
+        auto l = {(std::cout << get_elem<Indexes>(t) << "\n", 0)...};
+    }
+};
 
 template<size_t N, class Tuple>
 void print_elems(Tuple& t) {
-    _print_elems<__integer_pack(N)...>(t);
+    _print_elems<std::make_index_sequence<N>>::print(t);
 }
 
 /*

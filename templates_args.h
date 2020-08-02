@@ -8,7 +8,7 @@ template <class> struct f_args;
 template <class F, class... ArgTypes>
 struct f_args<F(ArgTypes...)> {
     typedef F type;
-    static const size_t size = sizeof...(ArgTypes);
+    static const int size = static_cast<int>(sizeof...(ArgTypes));
 };
 
 int f(int, int&);
