@@ -7,6 +7,7 @@
 #include "templates_spec.h"
 #include "check_type_expr.h"
 #include "meta_list.h"
+#include "mem_ptr.h"
 
 int main(void)
 {
@@ -30,6 +31,9 @@ int main(void)
 
     std::cout << "\n--------- meta_list::test()"  << "\n";
     meta_list::test();
+
+    std::cout << "\n--------- mem_ptr::test()"  << "\n";
+    mem_ptr::test();
 
     return 0;
 }

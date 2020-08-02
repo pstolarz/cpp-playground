@@ -9,7 +9,8 @@ HEADERS = \
     templates_args.h \
     templates_spec.h \
     check_type_expr.h \
-    meta_list.h
+    meta_list.h \
+    mem_ptr.h
 
 main: main.cpp $(HEADERS)
 	$(CC) $(CFLAGS) $< -o $@ --std=c++2a -lstdc++
