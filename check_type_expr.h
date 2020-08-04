@@ -34,14 +34,17 @@ struct chk_result {
 };
 
 template<typename T>
-chk_result<false> chk_sfinae_f(...);
+chk_result<false> _chk_sfinae(...);
 
 template<typename T>
-chk_result<true> chk_sfinae_f(int_alias<T_EXPR(T)>);
+chk_result<true> _chk_sfinae(int_alias<T_EXPR(T)>);
 
-/* check chk_sfinae_f(int) first, fall-back to chk_sfinae_f(...) in case of failure */
 template<typename T>
-auto chk_sfinae = decltype(chk_sfinae_f<T>(0))::value;
+struct chk_sfinae
+{
+    /* check _chk_sfinae(int) first, fall-back to _chk_sfinae(...) in case of failure */
+    static constexpr bool value = decltype(_chk_sfinae<T>(0))::value;
+};
 
 void test()
 {
@@ -50,8 +53,8 @@ void test()
     printf("  Check int&* : %d\n", chk_spec<int&>::value);
 
     printf("SFINAE check:\n");
-    printf("  Check int*  : %d\n", chk_sfinae<int>);
-    printf("  Check int&* : %d\n", chk_sfinae<int&>);
+    printf("  Check int*  : %d\n", chk_sfinae<int>::value);
+    printf("  Check int&* : %d\n", chk_sfinae<int&>::value);
 }
 
 } // namespace check_type_expr
