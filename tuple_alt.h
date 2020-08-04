@@ -2,7 +2,10 @@
 #define __TUPLE_ALT_H__
 
 #include <type_traits>
-#include <utility>  // C++14 std::integer_sequence
+#if __cplusplus >= 201402L
+// C++14 std::integer_sequence
+#include <utility>
+#endif
 
 namespace tuple_alt {
 
@@ -77,9 +80,11 @@ using get_tuple = _get_tuple<N, !N, _Tuple<Index, Types...>>;
 
 template<std::size_t N, std::size_t Index, typename ...Types>
 auto get_elem(const _Tuple<Index, Types...>& t)
+#if __cplusplus == 201103L
     // C++11 required
-    // -> decltype(std::declval<
-    //    typename get_tuple<N, Index, Types...>::type>().get_elem())
+    -> decltype(std::declval<
+        typename get_tuple<N, Index, Types...>::type>().get_elem())
+#endif
 {
     static_assert(N >= 0 && N < _Tuple<Index, Types...>::size, "Invalid depth");
     return static_cast<
@@ -87,6 +92,7 @@ auto get_elem(const _Tuple<Index, Types...>& t)
 }
 
 
+#if __cplusplus >= 201402L
 template<typename Seq>
 struct _print_elems;
 
@@ -104,6 +110,7 @@ template<std::size_t Index, typename ...Types>
 void print_elems(const _Tuple<Index, Types...>& t) {
     _print_elems<std::make_index_sequence<sizeof...(Types)>>::print(t);
 }
+#endif
 
 
 /*
@@ -133,7 +140,9 @@ void test()
 
     A a;
     auto t = tuple_alt(1, 2.5, "rv-string", i, d, str, pi, f, a, A{});
+#if __cplusplus >= 201402L
     print_elems(t);
+#endif
 
     auto e = get_elem<2>(t);
     std::cout << "Tuple element #2: " << e << "\n";

@@ -59,24 +59,57 @@ struct build_list:
 
 
 /* print list */
-template<typename T, T Val, typename Next = void>
-void print_list(list<T, Val, Next>&&)
+#if __cplusplus >= 201703L
+template<typename T, T Val, typename Next>
+void print_list(list<T, Val, Next>*)
 {
     std::cout << list<T, Val, Next>::value << std::endl;
+    // C++17 compile time check
     if constexpr (!list<T, Val, Next>::last)
-        print_list(typename list<T, Val, Next>::next{});
+        print_list(static_cast<typename list<T, Val, Next>::next*>(nullptr));
+}
+#else
+/*
+ * Final recursion step
+ * NOTE: the constexpr function returns void* to make C++11 compiler happy
+ */
+constexpr void *_print_list(void*) {
+    return nullptr;
 }
 
-template<typename T, T Val, typename Next = void>
-void print_list(list<T, Val, Next>&)
+template<typename T, T Val, typename Next>
+void _print_list(list<T, Val, Next>*)
 {
-    print_list(list<T, Val, Next>{});
+    std::cout << list<T, Val, Next>::value << std::endl;
+    if (!list<T, Val, Next>::last)
+        _print_list(static_cast<typename list<T, Val, Next>::next*>(nullptr));
 }
+
+template<typename T, T Val, typename Next>
+inline void print_list(list<T, Val, Next> *p)
+{
+    _print_list(p);
+}
+#endif
+
+#if __cplusplus >= 201402L
+template<typename List>
+static constexpr List *list_ptr = nullptr;
+#else
+template<typename List>
+constexpr List* make_list_ptr() {
+    return nullptr;
+}
+#endif
 
 void test()
 {
-    using list = build_list<int, 1, 2, 3>::type;
-    print_list(list{});
+    using List = build_list<int, 1, 2, 3>::type;
+#if __cplusplus >= 201402L
+    print_list(list_ptr<List>);
+#else
+    print_list(make_list_ptr<List>());
+#endif
 }
 
 } // namespace meta_list
