@@ -1,6 +1,6 @@
-CC=gcc-10
+.PHONY: all clean
 
-all: main
+CC=gcc-10
 
 HEADERS = \
     refs.h \
@@ -12,7 +12,10 @@ HEADERS = \
     meta_list.h \
     mem_ptr.h
 
-main: main.cpp $(HEADERS)
-	$(CC) $(CFLAGS) $< -o $@ --std=c++2a -lstdc++
+all: main
+
 clean:
 	rm -f main
+
+main: main.cpp $(HEADERS)
+	$(CC) $(CFLAGS) $< -o $@ --std=c++2a -lstdc++

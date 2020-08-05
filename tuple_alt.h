@@ -60,6 +60,8 @@ _Tuple<0, List...> tuple_alt(List&&... list)
 };
 
 
+namespace {
+
 template<std::size_t N, bool RecurCond, typename Tuple>
 struct _get_tuple;
 
@@ -74,24 +76,28 @@ struct _get_tuple<0, true, _Tuple<Index, Types...>>
     using type = _Tuple<Index, Types...>;
 };
 
-template<std::size_t N, std::size_t Index, typename ...Types>
-using get_tuple = _get_tuple<N, !N, _Tuple<Index, Types...>>;
+} // unnamed namespace
+
+template<std::size_t N, typename Tuple>
+using get_tuple = _get_tuple<N, !N, Tuple>;
 
 template<std::size_t N, std::size_t Index, typename ...Types>
 auto get_elem(const _Tuple<Index, Types...>& t)
 #if __cplusplus == 201103L
     // C++11 required
     -> decltype(std::declval<
-        typename get_tuple<N, Index, Types...>::type>().get_elem())
+        typename get_tuple<N, _Tuple<Index, Types...>>::type>().get_elem())
 #endif
 {
     static_assert(N >= 0 && N < sizeof...(Types), "Invalid depth");
     return static_cast<
-        const typename get_tuple<N, Index, Types...>::type*>(&t)->get_elem();
+        const typename get_tuple<N, _Tuple<Index, Types...>>::type*>(&t)->get_elem();
 }
 
 
 #if __cplusplus >= 201402L
+namespace {
+
 template<typename Seq>
 struct _print_elems;
 
@@ -110,6 +116,8 @@ struct _print_elems<std::integer_sequence<std::size_t, Indexes...>>
     }
 };
 
+} // unnamed namespace
+
 /*
  * Print tuple elements via expanding integer indexes passed by
  * integer_sequence type (C++14).
@@ -119,6 +127,8 @@ void print_elems(const _Tuple<Index, Types...>& t) {
     _print_elems<std::make_index_sequence<sizeof...(Types)>>::print(t);
 }
 #else
+namespace {
+
 /*
  * Final recursion step
  * NOTE: the constexpr function returns void* to make C++11 compiler happy
@@ -137,6 +147,8 @@ void _print_elems(const _Tuple<Index, Types...>* t)
     std::cout << "#" << Index << ": " << t->get_elem() << "\n";
     _print_elems(static_cast<const typename _Tuple<Index, Types...>::next*>(t));
 }
+
+} // unnamed namespace
 
 template<std::size_t Index, typename ...Types>
 inline void print_elems(const _Tuple<Index, Types...>& t)
