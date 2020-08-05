@@ -3,7 +3,7 @@
 
 namespace templates_spec {
 
-template<class T1, class T2>
+template<typename T1, typename T2>
 struct tm_1 {};
 
 template<>
@@ -14,10 +14,10 @@ struct tm_1<int, int> {};
 template<>
 struct tm_1<> {};
 
-template<class T1>
+template<typename T1>
 struct tm_1<T1> {};
 
-template<class T1, class T2>
+template<typename T1, typename T2>
 struct tm_1<T1, int, T2> {};
 */
 
@@ -38,7 +38,7 @@ struct tm_2<3, 3> {
 };
 
 
-template<class T1, class ...Ts>
+template<typename T1, typename ...Ts>
 struct tm_3 {
     constexpr static const char *name = "tm_3<T1, ...>";
 };
@@ -48,7 +48,7 @@ struct tm_3<int, int, int> {
     constexpr static const char *name = "tm_3<int, int, int>";
 };
 
-template<class T1>
+template<typename T1>
 struct tm_3<T1> {
     constexpr static const char *name = "tm_3<T1>";
 };
@@ -60,7 +60,7 @@ struct tm_3<> {};
 */
 
 
-template<class ...Ts>
+template<typename ...Ts>
 struct tm_4 {
     constexpr static const char *name = "tm_4<...>";
 };
@@ -71,25 +71,25 @@ struct tm_4<> {
 };
 
 
-template<class T, class = T*>
+template<typename T, typename = T*>
 struct tm_5 {
     constexpr static const char *name = "tm_5<T, = *T>";
 };
 
-template<class T>
+template<typename T>
 struct tm_5<T, int> {
     constexpr static const char *name = "tm_5<T1, int>";
 };
 
 // ERROR: does not specialize any template arguments
 /*
-template<class T1, class T2>
+template<typename T1, typename T2>
 struct tm_5<T1, T2> {};
 */
 
 // ERROR: default template arguments may not be used in partial specializations
 /*
-template<class T = bool>
+template<typename T = bool>
 struct tm_5<int, T> {};
 */
 

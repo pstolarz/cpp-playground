@@ -99,10 +99,14 @@ template<std::size_t ...Indexes>
 struct _print_elems<std::integer_sequence<std::size_t, Indexes...>>
 {
     template<std::size_t Index, typename ...Types>
-    static void print(const _Tuple<Index, Types...>& t) {
+    static void print(const _Tuple<Index, Types...>& t)
+    {
         // use initializer-list to ensure proper elements order
         auto l = {(std::cout << "#" << Indexes << ": " <<
             get_elem<Indexes>(t) << "\n", 0)...};
+
+        // get rid warning
+        (void)l;
     }
 };
 
@@ -150,13 +154,13 @@ struct A {};
 
 std::ostream& operator<<(std::ostream& os, const A& a)
 {
-    std::cout << "struct A lvalue";
+    std::cout << "struct A lvalue" << " addr: " << reinterpret_cast<const void*>(&a);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const A&& a)
 {
-    std::cout << "struct A rvalue";
+    std::cout << "struct A rvalue" << " addr: " << reinterpret_cast<const void*>(&a);
     return os;
 }
 

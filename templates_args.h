@@ -3,11 +3,11 @@
 
 namespace templates_args {
 
-template <class> struct f_args;
+template <typename> struct f_args;
 
-template <class F, class... ArgTypes>
+template <typename F, typename... ArgTypes>
 struct f_args<F(ArgTypes...)> {
-    typedef F type;
+    using type = F;
     static const int size = static_cast<int>(sizeof...(ArgTypes));
 };
 
@@ -17,33 +17,33 @@ struct A {
     int f(int, int&);
 };
 
-template <class> struct in_class;
+template <typename> struct in_class;
 
-template <class T, class C>
+template <typename T, typename C>
 struct in_class<T C::*>
 {
-    typedef T type;
-    typedef C class_type;
+    using type = T;
+    using class_type = C;
 };
 
-template <class T, class C, class ...Args>
+template <typename T, typename C, typename ...Args>
 struct in_class<T (C::*)(Args...)>
 {
-    typedef T type;
-    typedef C class_type;
+    using type = T;
+    using class_type = C;
 };
 
-template<class T>
+template<typename T>
 using in_class_m = in_class<T>;
 
-template<class T>
+template<typename T>
 using in_class_f = in_class<T>;
 
 void test()
 {
-    typedef decltype(f) f_t;
-    typedef f_t *pf_t;
-    typedef f_t& rf_t;
+    using f_t = decltype(f);
+    using pf_t = f_t*;
+    using rf_t = f_t&;
 
     printf("f_t: int:%d, Args:%d\n",
         std::is_same<f_args<f_t>::type, int>::value,
@@ -69,9 +69,9 @@ void test()
         std::is_same<f_args<rf_t(double)>::type, int(&)(int, int&)>::value,
         f_args<rf_t(double)>::size);
 
-    typedef decltype(&A::f) pmf_t;
-    typedef std::remove_pointer<pmf_t> mf_t;
-    typedef mf_t& rmf_t;
+    using pmf_t = decltype(&A::f);
+    // using mf_t = std::remove_pointer<pmf_t>;
+    // using rmf_t = mf_t&;
 
     printf("\n");
 
@@ -91,7 +91,7 @@ void test()
 
     printf("\n");
 
-    typedef decltype(&A::m) pmm_t;
+    using pmm_t = decltype(&A::m);
 
     printf("in_class_m pmm_t: int:%d, class A:%d\n",
         std::is_same<in_class_m<pmm_t>::type, int>::value,

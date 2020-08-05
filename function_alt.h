@@ -3,14 +3,14 @@
 
 namespace function_alt {
 
-template<class Res, class ...Args>
+template<typename Res, typename ...Args>
 struct _FunctorBase
 {
     virtual Res operator() (Args... args) = 0;
     virtual ~_FunctorBase() = default;
 };
 
-template<class F, class Res, class ...Args>
+template<typename F, typename Res, typename ...Args>
 struct _Functor: _FunctorBase<Res, Args...>
 {
     _Functor(F& f): f(f) {}
@@ -24,9 +24,9 @@ private:
     F& f;
 };
 
-template<class T> struct Function;
+template<typename T> struct Function;
 
-template<class Res, class ...Args>
+template<typename Res, typename ...Args>
 struct Function<Res(Args...)>
 {
     Function() = default;
@@ -36,7 +36,7 @@ struct Function<Res(Args...)>
         _functor = nullptr; 
     }
 
-    template<class F>
+    template<typename F>
     Function& operator= (F& f) {
         _functor = new _Functor<F, Res, Args...>(f);
         return *this;
@@ -66,10 +66,10 @@ struct _Fo {
 
     int operator() (short i, int& j)
     {
-    std::cout << "i: " << --i << ", ";
-    std::cout << "j: " << --j << "\n";
+        std::cout << "i: " << --i << ", ";
+        std::cout << "j: " << --j << "\n";
 
-    return (i-j);
+        return (i-j);
     }
 };
 

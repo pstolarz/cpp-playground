@@ -10,19 +10,19 @@ template <typename...> using void_alias = T_alias<void>;
 template <typename...> using int_alias = T_alias<int>;
 
 /* chk_spec<T, (T2)>; T2 is assumed to be always void therefore set as default */
-template <class T, class = void>
+template <typename T, typename = void>
 struct chk_spec {
     static constexpr bool value = false;
 };
 
 /* chk_spec<T, void> spec. */
-template <class T>
+template <typename T>
 struct chk_spec<T, void_alias<T_EXPR(T)>> {
     static constexpr bool value = true;
 };
 
 /* ERROR : conflinting with previoud spec.: chk_spec<T, void>
-template <class T>
+template <typename T>
 struct chk_spec<T, void_alias<void>> {
     static constexpr int value = true;
 };

@@ -19,6 +19,12 @@ void test(void)
         std::is_same<decltype(&C::a), int C::A::*>::value &&
         std::is_same<decltype(&C::a), int A::*>::value);
 
+    /*
+     * The following printf's causes warnings related to usage
+     * pointer-to-class-member while formatting to %d
+     * (C++ doesn't allow to cast such pointers to integer type).
+     */
+
     int C::*pmC = &C::a;
     printf("decltype(pmC) == int C::* is %d; pmC as &C::a value: %d\n",
         std::is_same<decltype(pmC), int C::*>::value, pmC);

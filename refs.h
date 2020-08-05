@@ -3,7 +3,7 @@
 
 namespace refs {
 
-template<class T>
+template<typename T>
 static void _f_ref(T& t) {
     printf("ref_test(T&)\n");
 
@@ -11,7 +11,7 @@ static void _f_ref(T& t) {
     printf("  i:%d [%p]\n", t, &t);
 }
 
-template<class T>
+template<typename T>
 static void _f_ref(T&& t) {
     printf("ref_test(T&&)\n");
 
