@@ -2,16 +2,15 @@
 #define __TUPLE_ALT_H__
 
 #include <type_traits>
-#if __cplusplus >= 201402L
-// C++14 std::integer_sequence
-#include <utility>
-#endif
+#include <utility> // C++14 std::integer_sequence
 
 namespace tuple_alt {
 
 template<std::size_t Index, typename Head, typename ...Tail>
 struct _Tuple: _Tuple<Index+1, Tail...>
 {
+    using next = _Tuple<Index+1, Tail...>;
+
     Head&& h; // Head lvalue with possible references to Head rvalues
 
     _Tuple(Head&& h, Tail&&... tail):
@@ -41,6 +40,8 @@ struct _Tuple: _Tuple<Index+1, Tail...>
 template<std::size_t Index, typename Head>
 struct _Tuple<Index, Head>
 {
+    using next = void;
+
     Head&& h;
 
     _Tuple(Head&& h):
@@ -50,8 +51,6 @@ struct _Tuple<Index, Head>
     Head&& get_elem() const {
         return std::forward<decltype(h)>(h);
     }
-
-    static constexpr std::size_t size = Index+1;
 };
 
 template<typename ...List>
@@ -62,11 +61,11 @@ _Tuple<0, List...> tuple_alt(List&&... list)
 
 
 template<std::size_t N, bool RecurCond, typename Tuple>
-struct _get_tuple {};
+struct _get_tuple;
 
-template<std::size_t N, std::size_t Index, typename Head, typename ...Tail>
-struct _get_tuple<N, false, _Tuple<Index, Head, Tail...>>:
-    _get_tuple<N-1, !(N-1), _Tuple<Index+1, Tail...>>
+template<std::size_t N, std::size_t Index, typename ...Types>
+struct _get_tuple<N, false, _Tuple<Index, Types...>>:
+    _get_tuple<N-1, !(N-1), typename _Tuple<Index, Types...>::next>
 {};
 
 template<std::size_t Index, typename ...Types>
@@ -86,7 +85,7 @@ auto get_elem(const _Tuple<Index, Types...>& t)
         typename get_tuple<N, Index, Types...>::type>().get_elem())
 #endif
 {
-    static_assert(N >= 0 && N < _Tuple<Index, Types...>::size, "Invalid depth");
+    static_assert(N >= 0 && N < sizeof...(Types), "Invalid depth");
     return static_cast<
         const typename get_tuple<N, Index, Types...>::type*>(&t)->get_elem();
 }
@@ -102,13 +101,43 @@ struct _print_elems<std::integer_sequence<std::size_t, Indexes...>>
     template<std::size_t Index, typename ...Types>
     static void print(const _Tuple<Index, Types...>& t) {
         // use initializer-list to ensure proper elements order
-        auto l = {(std::cout << get_elem<Indexes>(t) << "\n", 0)...};
+        auto l = {(std::cout << "#" << Indexes << ": " <<
+            get_elem<Indexes>(t) << "\n", 0)...};
     }
 };
 
+/*
+ * Print tuple elements via expanding integer indexes passed by
+ * integer_sequence type (C++14).
+ */
 template<std::size_t Index, typename ...Types>
 void print_elems(const _Tuple<Index, Types...>& t) {
     _print_elems<std::make_index_sequence<sizeof...(Types)>>::print(t);
+}
+#else
+/*
+ * Final recursion step
+ * NOTE: the constexpr function returns void* to make C++11 compiler happy
+ */
+constexpr void *_print_elems(const void*) {
+    return nullptr;
+}
+
+/*
+ * Classical printing routine by iterating the tuple from most derived
+ * class up to its first base class.
+ */
+template<std::size_t Index, typename ...Types>
+void _print_elems(const _Tuple<Index, Types...>* t)
+{
+    std::cout << "#" << Index << ": " << t->get_elem() << "\n";
+    _print_elems(static_cast<const typename _Tuple<Index, Types...>::next*>(t));
+}
+
+template<std::size_t Index, typename ...Types>
+inline void print_elems(const _Tuple<Index, Types...>& t)
+{
+    _print_elems(&t);
 }
 #endif
 
@@ -140,12 +169,12 @@ void test()
 
     A a;
     auto t = tuple_alt(1, 2.5, "rv-string", i, d, str, pi, f, a, A{});
-#if __cplusplus >= 201402L
     print_elems(t);
-#endif
+
+    std::cout << "\n";
 
     auto e = get_elem<2>(t);
-    std::cout << "Tuple element #2: " << e << "\n";
+    std::cout << "#2: " << e << "\n";
 }
 
 } // namespace tuple_alt
