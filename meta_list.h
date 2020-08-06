@@ -70,11 +70,11 @@ void print_list(list<T, Val, Next>*)
 }
 #else
 /*
- * Final recursion step
- * NOTE: the constexpr function returns void* to make C++11 compiler happy
+ * Final recursion step.
+ * NOTE: the constexpr function returns (int)0 to make C++11 compiler happy.
  */
-constexpr void *_print_list(void*) {
-    return nullptr;
+constexpr int _print_list(void*) {
+    return 0;
 }
 
 template<typename T, T Val, typename Next>

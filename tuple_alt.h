@@ -5,16 +5,25 @@
 #include <utility> // C++14 std::integer_sequence
 
 namespace tuple_alt {
+namespace {
 
-template<std::size_t Index, typename Head, typename ...Tail>
-struct _Tuple: _Tuple<Index+1, Tail...>
+template<typename ...Types>
+struct _TypesList;
+
+template<typename TypesList>
+struct _Tuple;
+
+// terminator
+template<>
+struct _Tuple<_TypesList<>> {};
+
+template<typename Head, typename ...Tail>
+struct _Tuple<_TypesList<Head, Tail...>>: _Tuple<_TypesList<Tail...>>
 {
-    using next = _Tuple<Index+1, Tail...>;
-
-    Head&& h; // Head lvalue with possible references to Head rvalues
+    using next = _Tuple<_TypesList<Tail...>>;
 
     _Tuple(Head&& h, Tail&&... tail):
-        _Tuple<Index+1, Tail...>(std::forward<decltype(tail)>(tail)...),
+        next(std::forward<decltype(tail)>(tail)...),
         /*
          * NOTES:
          * 1. 'h(h)' doesn't work here since 'h' (as function argument) is
@@ -35,28 +44,20 @@ struct _Tuple: _Tuple<Index+1, Tail...>
     Head&& get_elem() const {
         return std::forward<decltype(h)>(h);
     }
+
+private:
+    Head&& h; // Head lvalue with possible references to Head rvalues
 };
 
-template<std::size_t Index, typename Head>
-struct _Tuple<Index, Head>
+} // unnamed namespace
+
+// final base of all tuples in the inheritance hierarchy (empty class)
+using TupleEnd = _Tuple<_TypesList<>>;
+
+template<typename ...Types>
+_Tuple<_TypesList<Types...>> tuple_alt(Types&&... args)
 {
-    using next = void;
-
-    Head&& h;
-
-    _Tuple(Head&& h):
-        h(std::forward<decltype(h)>(h))
-    {}
-
-    Head&& get_elem() const {
-        return std::forward<decltype(h)>(h);
-    }
-};
-
-template<typename ...List>
-_Tuple<0, List...> tuple_alt(List&&... list)
-{
-    return _Tuple<0, List...>(std::forward<decltype(list)>(list)...);
+    return _Tuple<_TypesList<Types...>>(std::forward<decltype(args)>(args)...);
 };
 
 
@@ -65,15 +66,15 @@ namespace {
 template<std::size_t N, bool RecurCond, typename Tuple>
 struct _get_tuple;
 
-template<std::size_t N, std::size_t Index, typename ...Types>
-struct _get_tuple<N, false, _Tuple<Index, Types...>>:
-    _get_tuple<N-1, !(N-1), typename _Tuple<Index, Types...>::next>
+template<std::size_t N, typename ...Types>
+struct _get_tuple<N, false, _Tuple<_TypesList<Types...>>>:
+    _get_tuple<N-1, !(N-1), typename _Tuple<_TypesList<Types...>>::next>
 {};
 
-template<std::size_t Index, typename ...Types>
-struct _get_tuple<0, true, _Tuple<Index, Types...>>
+template<typename ...Types>
+struct _get_tuple<0, true, _Tuple<_TypesList<Types...>>>
 {
-    using type = _Tuple<Index, Types...>;
+    using type = _Tuple<_TypesList<Types...>>;
 };
 
 } // unnamed namespace
@@ -81,17 +82,17 @@ struct _get_tuple<0, true, _Tuple<Index, Types...>>
 template<std::size_t N, typename Tuple>
 using get_tuple = _get_tuple<N, !N, Tuple>;
 
-template<std::size_t N, std::size_t Index, typename ...Types>
-auto get_elem(const _Tuple<Index, Types...>& t)
+template<std::size_t N, typename ...Types>
+auto get_elem(const _Tuple<_TypesList<Types...>>& t)
 #if __cplusplus == 201103L
     // C++11 required
-    -> decltype(std::declval<
-        typename get_tuple<N, _Tuple<Index, Types...>>::type>().get_elem())
+    -> decltype(std::declval<typename get_tuple<
+        N, _Tuple<_TypesList<Types...>>>::type>().get_elem())
 #endif
 {
     static_assert(N >= 0 && N < sizeof...(Types), "Invalid depth");
-    return static_cast<
-        const typename get_tuple<N, _Tuple<Index, Types...>>::type*>(&t)->get_elem();
+    return static_cast<const typename get_tuple<
+        N, _Tuple<_TypesList<Types...>>>::type*>(&t)->get_elem();
 }
 
 
@@ -104,8 +105,8 @@ struct _print_elems;
 template<std::size_t ...Indexes>
 struct _print_elems<std::integer_sequence<std::size_t, Indexes...>>
 {
-    template<std::size_t Index, typename ...Types>
-    static void print(const _Tuple<Index, Types...>& t)
+    template<typename ...Types>
+    static void print(const _Tuple<_TypesList<Types...>>& t)
     {
         // use initializer-list to ensure proper elements order
         auto l = {(std::cout << "#" << Indexes << ": " <<
@@ -122,38 +123,40 @@ struct _print_elems<std::integer_sequence<std::size_t, Indexes...>>
  * Print tuple elements via expanding integer indexes passed by
  * integer_sequence type (C++14).
  */
-template<std::size_t Index, typename ...Types>
-void print_elems(const _Tuple<Index, Types...>& t) {
+template<typename ...Types>
+void print_elems(const _Tuple<_TypesList<Types...>>& t) {
     _print_elems<std::make_index_sequence<sizeof...(Types)>>::print(t);
 }
 #else
 namespace {
 
 /*
- * Final recursion step
- * NOTE: the constexpr function returns void* to make C++11 compiler happy
+ * Final recursion step.
+ * NOTE: the constexpr function returns (int)0 to make C++11 compiler happy.
  */
-constexpr void *_print_elems(const void*) {
-    return nullptr;
+template<std::size_t I>
+constexpr std::size_t _print_elems(const TupleEnd*) {
+    return 0;
 }
 
 /*
  * Classical printing routine by iterating the tuple from most derived
  * class up to its first base class.
  */
-template<std::size_t Index, typename ...Types>
-void _print_elems(const _Tuple<Index, Types...>* t)
+template<std::size_t I, typename ...Types>
+void _print_elems(const _Tuple<_TypesList<Types...>> *t)
 {
-    std::cout << "#" << Index << ": " << t->get_elem() << "\n";
-    _print_elems(static_cast<const typename _Tuple<Index, Types...>::next*>(t));
+    std::cout << "#" << I << ": " << t->get_elem() << "\n";
+    _print_elems<I+1>(static_cast<
+        const typename _Tuple<_TypesList<Types...>>::next*>(t));
 }
 
 } // unnamed namespace
 
-template<std::size_t Index, typename ...Types>
-inline void print_elems(const _Tuple<Index, Types...>& t)
+template<typename ...Types>
+inline void print_elems(const _Tuple<_TypesList<Types...>>& t)
 {
-    _print_elems(&t);
+    _print_elems<0>(&t);
 }
 #endif
 
@@ -166,13 +169,15 @@ struct A {};
 
 std::ostream& operator<<(std::ostream& os, const A& a)
 {
-    std::cout << "struct A lvalue" << " addr: " << reinterpret_cast<const void*>(&a);
+    std::cout <<
+        "struct A lvalue" << " addr: " << reinterpret_cast<const void*>(&a);
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const A&& a)
 {
-    std::cout << "struct A rvalue" << " addr: " << reinterpret_cast<const void*>(&a);
+    std::cout <<
+        "struct A rvalue" << " addr: " << reinterpret_cast<const void*>(&a);
     return os;
 }
 
