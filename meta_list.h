@@ -69,10 +69,7 @@ void print_list(list<T, Val, Next>*)
         print_list(static_cast<typename list<T, Val, Next>::next*>(nullptr));
 }
 #else
-/*
- * Final recursion step.
- * NOTE: the constexpr function returns (int)0 to make C++11 compiler happy.
- */
+// final recursion (constexpr function returns 0 to make C++11 compiler happy)
 constexpr int _print_list(void*) {
     return 0;
 }
