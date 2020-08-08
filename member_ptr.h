@@ -4,7 +4,7 @@
 #include <type_traits>
 #include <stdio.h>
 
-namespace mem_ptr {
+namespace member_ptr {
 
 struct A { int a; };
 struct B { int b; };
@@ -42,6 +42,6 @@ void test(void)
         std::is_same<decltype(pmB), int B::*>::value, pmB);
 }
 
-} // namespace mem_ptr
+} // namespace member_ptr
 
 #endif /* __MEM_PTR_H__ */

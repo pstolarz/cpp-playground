@@ -10,7 +10,7 @@ HEADERS = \
     templates_spec.h \
     check_type_expr.h \
     meta_list.h \
-    mem_ptr.h
+    member_ptr.h
 
 all: main
 
