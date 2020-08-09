@@ -14,11 +14,46 @@ struct _MembPtr
 {
     T *t;
     F B::*f;
+    bool alloced;
 
     static_assert(std::is_base_of<B, T>::value,
         "Member function declared to be called on wrong object");
 
-    _MembPtr(T *t, F B::*f): t(t), f(f) {}
+    _MembPtr(T *t, F B::*f, bool alloced = false):
+        t(t), f(f), alloced(alloced)
+    {}
+
+    // container is alway unique
+    _MembPtr(const _MembPtr&) = delete;
+    _MembPtr& operator= (const _MembPtr&) = delete;
+
+    _MembPtr(_MembPtr&& mp):
+        t(mp.t), f(mp.f), alloced(mp.alloced)
+    {
+        mp.t = nullptr;
+        mp.f = nullptr;
+        mp.alloced = false;
+    }
+
+    _MembPtr& operator= (_MembPtr&& mp)
+    {
+        t = mp.t;
+        f = mp.f;
+        alloced = mp.alloced;
+
+        mp.t = nullptr;
+        mp.f = nullptr;
+        mp.alloced = false;
+    }
+
+    ~_MembPtr() {
+        if (alloced) {
+            delete t;
+            alloced = false;
+        }
+        t = nullptr;
+        f = nullptr;
+    }
 };
 
 } // unnamed namespace
@@ -37,19 +72,35 @@ private:
     };
 
     // class with operator()
-    template<typename F>
+    template<typename F, typename Fd = typename std::decay<F>::type>
     struct Functor: FunctorBase
     {
-        F& f;
+        Fd *f = nullptr;
+        bool alloced = false;
 
-        Functor(F& f): f(f) {};
+        Functor(F& f): f(&f) {};
+
+        Functor(F&& f)
+        {
+            // move rvalue to a new object
+            this->f = new Fd(std::move(f));
+            alloced = true;
+        };
+
+        ~Functor() {
+            if (alloced) {
+                delete f;
+                alloced = false;
+            }
+            f = nullptr;
+        }
 
         Res operator() (Args... args) const
             // exception spec. taken from passed functor
-            noexcept(noexcept(f(args...)))
+            noexcept(noexcept((*f)(args...)))
             override
         {
-            return f(args...);
+            return (*f)(args...);
         }
     };
 
@@ -75,16 +126,17 @@ private:
     template<typename T, typename F, typename B>
     struct Functor<_MembPtr<T, F, B>>: FunctorBase
     {
-        F B::*f;
-        T *t;
+        _MembPtr<T, F, B> mp;
 
-        Functor(const _MembPtr<T, F, B>& mp): f(mp.f), t(mp.t) {};
+        Functor(_MembPtr<T, F, B>&& mp):
+            mp(std::move(mp))
+        {};
 
         Res operator() (Args... args) const
-            noexcept(noexcept((std::declval<B>().*f)(args...)))
+            noexcept(noexcept((std::declval<B>().*(mp.f))(args...)))
             override
         {
-            return (t->*f)(args...);
+            return ((mp.t)->*(mp.f))(args...);
         }
     };
 
@@ -100,11 +152,11 @@ public:
     }
 
     // class with operator()
-    template<typename F>
-    Function& operator= (F& f)
+    template<typename F, typename Fd = typename std::decay<F>::type>
+    Function& operator= (F&& f)
     {
         delete _functor;
-        _functor = new Functor<typename std::decay<F>::type>(f);
+        _functor = new Functor<Fd>(std::forward<Fd>(f));
         return *this;
     }
 
@@ -144,16 +196,35 @@ _MembPtr<T, F, B> memb_ptr(T *t, F B::*f)
     return _MembPtr<T, F, B>(t, f);
 }
 
-template<typename T, typename F, typename B>
-_MembPtr<T, F, B> memb_ptr(T& t, F B::*f)
+template<typename T, typename F, typename B, typename Td = std::decay<T>::type>
+_MembPtr<Td, F, B> memb_ptr(T& t, F B::*f)
 {
-    return _MembPtr<T, F, B>(&t, f);
+    return _MembPtr<Td, F, B>(&t, f);
+}
+
+template<typename T, typename F, typename B, typename Td = std::decay<T>::type>
+_MembPtr<Td, F, B> memb_ptr(T&& t, F B::*f)
+{
+    return _MembPtr<Td, F, B>(
+        // move rvalue to a new object
+        new Td(std::move(t)),
+        f, true);
 }
 
 
 /*
  * test
  */
+// may throw
+static int f(long i, int& j) noexcept(false)
+{
+    std::cout << "f(long, int&) -> ";
+    std::cout << "--i: " << --i << ", ";
+    std::cout << "--j: " << --j << "\n";
+
+    return i+j;
+}
+
 struct S1
 {
     int operator() (short i, int& j)
@@ -166,18 +237,11 @@ struct S1
     }
 };
 
-// may throw
-static int f(long i, int& j) noexcept(false)
-{
-    std::cout << "f(long, int&) -> ";
-    std::cout << "--i: " << --i << ", ";
-    std::cout << "--j: " << --j << "\n";
-
-    return i+j;
-}
-
 struct S2
 {
+    // ERROR: move constr. is required if passing by rvalue
+    // S2(S2&&) = delete;
+
     int f(char i, int& j)
     {
         std::cout << "S2::f(char, int&) -> ";
@@ -201,6 +265,13 @@ struct S3: S1, S2
     }
 };
 
+inline static void print_res(int sum, int i, int j)
+{
+    std::cout << "sum: " << sum << ", ";
+    std::cout << "i: " << i << ", ";
+    std::cout << "j: " << j << "\n\n";
+}
+
 void test(void)
 {
     int i=0, j=0, sum;
@@ -209,38 +280,38 @@ void test(void)
     S1 s1;
     func = s1;
     sum = func(i, j);
-    std::cout << "sum: " << sum << ", ";
-    std::cout << "i: " << i << ", ";
-    std::cout << "j: " << j << "\n\n";
+    print_res(sum, i, j);
 
     func = f;
     sum = func(i, j);
-    std::cout << "sum: " << sum << ", ";
-    std::cout << "i: " << i << ", ";
-    std::cout << "j: " << j << "\n\n";
+    print_res(sum, i, j);
 
-    S2 s2;
-    func = memb_ptr(s2, &S2::f);
+    func = memb_ptr(S2(), &S2::f);
     sum = func(i, j);
-    std::cout << "sum: " << sum << ", ";
-    std::cout << "i: " << i << ", ";
-    std::cout << "j: " << j << "\n\n";
+    print_res(sum, i, j);
 
     S3 s3;
     func = memb_ptr(&s3, &S3::f);
     sum = func(i, j);
-    std::cout << "sum: " << sum << ", ";
-    std::cout << "i: " << i << ", ";
-    std::cout << "j: " << j << "\n\n";
+    print_res(sum, i, j);
 
     func = memb_ptr(s3, &S2::f);
     sum = func(i, j);
-    std::cout << "sum: " << sum << ", ";
-    std::cout << "i: " << i << ", ";
-    std::cout << "j: " << j << "\n";
+    print_res(sum, i, j);
 
     // ERROR: S1 is not derived from S2
     // func = memb_ptr(s1, &S2::f);
+
+    func = [](int i, int& j) -> int
+    {
+        std::cout << "lambda closure -> ";
+        std::cout << "i: " << i << ", ";
+        std::cout << "j: " << j << "\n";
+
+        return i+j;
+    };
+    sum = func(i, j);
+    print_res(sum, i, j);
 }
 
 } // namespace function_alt
