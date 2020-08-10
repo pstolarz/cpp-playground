@@ -1,3 +1,4 @@
+#include <cstring>
 #include <functional>   // std::bad_function_call exception
 #include <type_traits>
 
@@ -19,11 +20,13 @@ struct _MembPtr
     static_assert(std::is_base_of<B, T>::value,
         "Member function declared to be called on wrong object");
 
+    _MembPtr() = delete;
+
     _MembPtr(T *t, F B::*f, bool alloced = false):
         t(t), f(f), alloced(alloced)
     {}
 
-    // container is alway unique
+    // _MembPtr is unique
     _MembPtr(const _MembPtr&) = delete;
     _MembPtr& operator= (const _MembPtr&) = delete;
 
@@ -72,10 +75,10 @@ private:
     };
 
     // class with operator()
-    template<typename F, typename Fd = typename std::decay<F>::type>
+    template<typename F>
     struct Functor: FunctorBase
     {
-        Fd *f = nullptr;
+        F *f = nullptr;
         bool alloced = false;
 
         Functor(F& f): f(&f) {};
@@ -83,7 +86,7 @@ private:
         Functor(F&& f)
         {
             // move rvalue to a new object
-            this->f = new Fd(std::move(f));
+            this->f = new F(std::move(f));
             alloced = true;
         };
 
@@ -143,7 +146,24 @@ private:
     FunctorBase *_functor = nullptr;
 
 public:
-    Function() = default;
+    // require use operator= afterwards
+    explicit Function() = default;
+
+    // Function is unique
+    Function(const Function&) = delete;
+    Function& operator= (const Function&) = delete;
+
+    Function(Function&& f)
+    {
+        _functor = f._functor;
+        f._functor = nullptr;
+    }
+
+    Function& operator= (Function&& f)
+    {
+        _functor = f._functor;
+        f._functor = nullptr;
+    }
 
     ~Function()
     {
@@ -153,15 +173,31 @@ public:
 
     // class with operator()
     template<typename F, typename Fd = typename std::decay<F>::type>
+    Function(F&& f)
+    {
+        _functor = new Functor<Fd>(std::forward<decltype(f)>(f));
+    }
+
+    template<typename F, typename Fd = typename std::decay<F>::type>
     Function& operator= (F&& f)
     {
         delete _functor;
-        _functor = new Functor<Fd>(std::forward<Fd>(f));
+        _functor = new Functor<Fd>(std::forward<decltype(f)>(f));
         return *this;
     }
 
     // regular function
     // passed types may differ than the declared types if they are convertible
+    template<typename FRes, typename ...FArgs>
+    Function(FRes(*f)(FArgs... args))
+    {
+        // TODO: check if passed types are convertible
+        static_assert(sizeof...(FArgs) == sizeof...(Args),
+            "Calling arguments don't match");
+
+        _functor = new Functor<decltype(f)>(f);
+    }
+
     template<typename FRes, typename ...FArgs>
     Function& operator= (FRes(*f)(FArgs... args))
     {
@@ -176,6 +212,12 @@ public:
 
     // member function call
     template<typename T, typename F, typename B>
+    Function(const _MembPtr<T, F, B>& mp)
+    {
+        _functor = new Functor<_MembPtr<T, F, B>>(mp);
+    }
+
+    template<typename T, typename F, typename B>
     Function& operator= (const _MembPtr<T, F, B>& mp)
     {
         delete _functor;
@@ -183,6 +225,7 @@ public:
         return *this;
     }
 
+    // call with args
     Res operator() (Args... args) const noexcept(false)
     {
         if (!_functor) throw std::bad_function_call();
@@ -196,13 +239,15 @@ _MembPtr<T, F, B> memb_ptr(T *t, F B::*f)
     return _MembPtr<T, F, B>(t, f);
 }
 
-template<typename T, typename F, typename B, typename Td = std::decay<T>::type>
+template<typename T, typename F, typename B,
+    typename Td = typename std::decay<T>::type>
 _MembPtr<Td, F, B> memb_ptr(T& t, F B::*f)
 {
     return _MembPtr<Td, F, B>(&t, f);
 }
 
-template<typename T, typename F, typename B, typename Td = std::decay<T>::type>
+template<typename T, typename F, typename B,
+    typename Td = typename std::decay<T>::type>
 _MembPtr<Td, F, B> memb_ptr(T&& t, F B::*f)
 {
     return _MembPtr<Td, F, B>(
@@ -272,6 +317,13 @@ inline static void print_res(int sum, int i, int j)
     std::cout << "j: " << j << "\n\n";
 }
 
+using callback_t = Function<int(void*)>;
+
+int test_callback(callback_t&& cb, void *arg)
+{
+    return cb(arg);
+}
+
 void test(void)
 {
     int i=0, j=0, sum;
@@ -312,6 +364,25 @@ void test(void)
     };
     sum = func(i, j);
     print_res(sum, i, j);
+
+    auto func_mov = func;
+    // ERROR: func moved to func_mov (run time exception)
+    // func(i, j);
+
+    // Calls lambda once again. It's safe to call it again here even though
+    // the lambda was passed by rvalue, sine it has been moved and is stored
+    // inside Function object.
+    func_mov(i, j);
+    print_res(sum, i, j);
+
+    int res = test_callback(
+        [](void *arg) -> int {
+            std::cout << static_cast<const char*>(arg) << "\n";
+            return strlen(static_cast<const char*>(arg));
+        },
+        const_cast<char*>("Hello world!")
+    );
+    std::cout << "callback returned " << res << "\n";
 }
 
 } // namespace function_alt
