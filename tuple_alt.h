@@ -2,11 +2,12 @@
 #define __TUPLE_ALT_H__
 
 #include <type_traits>
-#include <utility> // C++14 std::integer_sequence
+// C++14 std::integer_sequence, C++17 std::tuple_size, std::tuple_element
+#include <utility>
 
 namespace tuple_alt {
 
-namespace {
+namespace detail {
 
 template<typename ...Types>
 struct _TypesList;
@@ -20,7 +21,7 @@ struct _Tuple<_TypesList<>> {};
 
 /*
  * get_tuple helpers (need to be defined here since the type function
- * get_tuple is references by _Tuple::get_elem<N> member template).
+ * get_tuple is references by _Tuple::get<N> member template).
  */
 template<std::size_t N, bool RecurCond, typename Tuple>
 struct _get_tuple;
@@ -36,16 +37,16 @@ struct _get_tuple<0, true, _Tuple<_TypesList<Types...>>>
     using type = _Tuple<_TypesList<Types...>>;
 };
 
-} // unnamed namespace
+} // detail namespace
 
 // final base of all tuples in the inheritance hierarchy (empty class)
-using TupleEnd = _Tuple<_TypesList<>>;
+using TupleEnd = detail::_Tuple<detail::_TypesList<>>;
 
 // get tuple with given index from the tuple class
 template<std::size_t N, typename Tuple>
-using get_tuple = _get_tuple<N, !N, Tuple>;
+using get_tuple = detail::_get_tuple<N, !N, Tuple>;
 
-namespace {
+namespace detail {
 
 template<typename Head, typename ...Tail>
 struct _Tuple<_TypesList<Head, Tail...>>: _Tuple<_TypesList<Tail...>>
@@ -72,22 +73,26 @@ struct _Tuple<_TypesList<Head, Tail...>>: _Tuple<_TypesList<Tail...>>
         h(std::forward<decltype(h)>(h))
     {}
 
-    Head&& get_elem() const {
+    // same as get<0>()
+    Head&& get() const {
         return std::forward<decltype(h)>(h);
     }
 
     // get element with a given index N (0 based)
     template<std::size_t N>
-    auto get_elem() const
-#if __cplusplus == 201103L
-        // C++11 required
-        -> decltype(
-            std::declval<typename get_tuple<N, type>::type>().get_elem())
-#endif
+    auto get() const
+        /*
+         * It's required to use trailing return syntax here since w/o this
+         * and >= C++14, 'auto' will return non-reference type therefore
+         * causing returning by value (and calling copy/move constructors
+         * for objects). 'decltype(auto)' would help in this case but it's
+         * not supported for C++11.
+         */
+        -> decltype(std::declval<typename get_tuple<N, type>::type>().get())
     {
         static_assert(N >= 0 && N <= sizeof...(Tail), "Invalid depth");
         return static_cast<
-            const typename get_tuple<N, type>::type*>(this)->get_elem();
+            const typename get_tuple<N, type>::type*>(this)->get();
     }
 
 #if __cplusplus >= 201402L
@@ -115,7 +120,7 @@ private:
     {
         // use initializer_list to ensure proper elements order
         auto l = {(std::cout << "#" << Indexes << ": " <<
-            get_elem<Indexes>() << "\n", 0)...};
+            get<Indexes>() << "\n", 0)...};
 
         // get rid of compiler warning
         (void)l;
@@ -135,28 +140,82 @@ private:
     template<std::size_t I, typename ...Types>
     static void _print_elems(const _Tuple<_TypesList<Types...>> *t)
     {
-        std::cout << "#" << I << ": " << t->get_elem() << "\n";
+        std::cout << "#" << I << ": " << t->get() << "\n";
         _print_elems<I+1>(static_cast<
             const typename _Tuple<_TypesList<Types...>>::next*>(t));
     }
 #endif
 };
 
-} // unnamed namespace
+#if __cplusplus >= 201703L
+template<std::size_t N, typename Tuple>
+struct _tuple_element;
+
+template<std::size_t N, typename... Types>
+struct _tuple_element<N, _Tuple<_TypesList<Types...>>>
+{
+private:
+    static_assert(N >= 0 && N < sizeof...(Types), "Invalid depth");
+    using tuple_type = typename get_tuple<N, _Tuple<_TypesList<Types...>>>::type;
+
+public:
+    using type = decltype(std::declval<tuple_type>().get());
+};
+#endif
+
+} // detail namespace
 
 // create tuple
 template<typename ...Types>
-_Tuple<_TypesList<Types...>> make_tuple(Types&&... args)
+detail::_Tuple<detail::_TypesList<Types...>> make_tuple(Types&&... args)
 {
-    return _Tuple<_TypesList<Types...>>(std::forward<decltype(args)>(args)...);
+    return detail::_Tuple<detail::_TypesList<Types...>>(
+        std::forward<decltype(args)>(args)...);
 };
+
+} // tuple_alt namespace
+
+#if __cplusplus >= 201703L
+/*
+ * std::tuple_size and std::tuple_element specialization (required for C++17
+ * structured binding).
+ *
+ * NOTE: To not mess the std namespace by 'using function_alt::XYZ' full
+ * symbols specification is provided here but main implementation of
+ * tuple_element is provided by _tuple_element base class.
+ */
+namespace std {
+
+template<typename... Types>
+struct tuple_size<
+        tuple_alt::detail::_Tuple<tuple_alt::detail::_TypesList<Types...>>>:
+    integral_constant<size_t, sizeof...(Types)>
+{};
+
+template<size_t N, typename... Types>
+struct tuple_element<
+        N, tuple_alt::detail::_Tuple<tuple_alt::detail::_TypesList<Types...>>>:
+    tuple_alt::detail::_tuple_element<
+        N, tuple_alt::detail::_Tuple<tuple_alt::detail::_TypesList<Types...>>>
+{};
+
+} // std namespace
+#endif
 
 
 /*
  * test
  */
+namespace tuple_alt {
+
 static void f() {}
-struct A {};
+struct A {
+    A() = default;
+
+    // to make sure no extra A copies are performed
+    A(const A&) = delete;
+    A(A&&) = delete;
+};
 
 std::ostream& operator<<(std::ostream& os, const A& a)
 {
@@ -176,20 +235,54 @@ void test()
 {
     int i = 3;
     double d = 4.5;
-    char str[] = "lv-string";
+    char str[] = "RW-string";
     int *pi = &i;
 
     A a;
-    auto t = make_tuple(1, 2.5, "rv-string", i, d, str, pi, f, a, A{});
+    auto t = make_tuple(
+        1,              // 0
+        2.5,            // 1
+        "RO-string",    // 2
+        i,              // 3
+        d,              // 4
+        str,            // 5
+        pi,             // 6
+        f,              // 7
+        a,              // 8
+        A{}             // 9
+    );
     t.print_elems();
 
     std::cout << "\n";
 
-    std::cout << "#0: " << t.get_elem() << "\n";
-    std::cout << "#2: " << t.get_elem<2>() << "\n";
+    std::cout << "#0: " << t.get() << "\n";
+    std::cout << "#2: " << t.get<2>() << "\n";
 
     // ERROR - element out of size
-    // auto e = t.get_elem<10>();
+    // t.get<10>();
+
+#if __cplusplus >= 201703L
+    std::cout << "\n";
+
+    // structured binding test
+    auto& [e0, e1, e2, e3, e4, e5, e6, e7, e8, e9] = t;
+    std::cout << "#0: " << e0 << "\n";
+    std::cout << "#1: " << e1 << "\n";
+    std::cout << "#2: " << e2 << "\n";
+    std::cout << "#3: " << e3 << "\n";
+    std::cout << "#4: " << e4 << "\n";
+    std::cout << "#5: " << e5 << "\n";
+    std::cout << "#6: " << e6 << "\n";
+    std::cout << "#7: " << e7 << "\n";
+    std::cout << "#8: " << e8 << "\n";
+    std::cout << "#9: " << e9 << "\n";
+
+    std::cout << "\n";
+
+    // e3 is a reference to i
+    e3++;
+    std::cout << "#3: " << e3 << ", i: " << i << "\n";
+#endif
 }
 
 } // namespace tuple_alt
