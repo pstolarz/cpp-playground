@@ -4,13 +4,13 @@ CC=gcc-10
 
 HEADERS = \
     refs.h \
-    tuple_alt.h \
-    function_alt.h \
     templates_args.h \
     templates_spec.h \
+    member_ptr.h \
     check_type_expr.h \
     meta_list.h \
-    member_ptr.h
+    function_alt.h \
+    tuple_alt.h
 
 all: main
 
