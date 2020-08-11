@@ -86,7 +86,7 @@ private:
         Functor(F&& f)
         {
             // move rvalue to a new object
-            this->f = new typename std::decay<F>::type(std::move(f));
+            this->f = new F(std::move(f));
             alloced = true;
         };
 
@@ -247,7 +247,7 @@ _MembPtr<Td, F, B> memb_ptr(T& t, F B::*f)
 }
 
 template<typename T, typename F, typename B,
-    typename Td = typename std::decay<T>::type>
+    typename Td = typename std::remove_reference<T>::type>
 _MembPtr<Td, F, B> memb_ptr(T&& t, F B::*f)
 {
     return _MembPtr<Td, F, B>(
