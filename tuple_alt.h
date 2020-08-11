@@ -54,28 +54,40 @@ struct _Tuple<_TypesList<Head, Tail...>>: _Tuple<_TypesList<Tail...>>
     using type = _Tuple<_TypesList<Head, Tail...>>;
     using next = _Tuple<_TypesList<Tail...>>;
 
+    // if Head&& is prvalue -> store by const copy
+    // if Head&& is xvalue -> store by copy
+    // if Head&& is lvalue -> keep reference
+    using elem_type =
+        // let T = ref-removed Head
+        typename std::conditional<
+            std::is_rvalue_reference<Head>::value,
+            // T&& stored as T (xvalue copy)
+            typename std::remove_reference<Head>::type,
+            typename std::conditional<
+                std::is_lvalue_reference<Head>::value,
+                // T& stored as T& (lvalue ref)
+                Head,
+                // T stored as T (copy for xvalue or const copy for prvalue)
+                typename std::conditional<
+                    std::is_class<Head>::value ||
+                    std::is_union<Head>::value,
+                    // xvalue
+                    Head,
+                    // prvalue
+                    const Head
+                >::type
+            >::type
+        >::type;
+
     _Tuple(Head&& h, Tail&&... tail):
         next(std::forward<decltype(tail)>(tail)...),
-        /*
-         * NOTES:
-         * 1. 'h(h)' doesn't work here since 'h' (as function argument) is
-         * treated as Head lvalue and '_Tuple::h' is considered as Head rvalue,
-         * therefore there is a need to forward 'h' or cast 'h' as:
-         * 'h(static_cast<decltype(h)>(h))' which is equivalent to forwarding.
-         *
-         * 2. 'h(std::move(h))' also doesn't work here since 'std::move(h)' is
-         * Head rvalue and '_Tuple::h' is considered in this case as Head lvalue.
-         *
-         * As a conclusion T&& may be considered as rvalue/lvalue reference
-         * (depending on context) therefore any assignments between values of
-         * such types requires explicit casting (type forwarding).
-         */
-        h(std::forward<decltype(h)>(h))
+        // no need to forward since elem is copy or lvalue to h
+        elem(h)
     {}
 
     // same as get<0>()
-    Head&& get() const {
-        return std::forward<decltype(h)>(h);
+    elem_type get() const {
+        return elem;
     }
 
     // get element with a given index N (0 based)
@@ -83,40 +95,38 @@ struct _Tuple<_TypesList<Head, Tail...>>: _Tuple<_TypesList<Tail...>>
     auto get() const
         /*
          * It's required to use trailing return syntax here since w/o this
-         * and >= C++14, 'auto' will return non-reference type therefore
-         * causing returning by value (and calling copy/move constructors
-         * for objects). 'decltype(auto)' would help in this case but it's
-         * not supported for C++11.
+         * and >= C++14, 'auto' means non-reference type therefore causing
+         * returning by value (and calling copy/move constructors for stored
+         * lvalues). 'decltype(auto)' would help in this case but it's not
+         * supported by C++11.
          */
-        -> decltype(std::declval<typename get_tuple<N, type>::type>().get())
+        -> typename get_tuple<N, type>::type::elem_type
     {
         static_assert(N >= 0 && N <= sizeof...(Tail), "Invalid depth");
-        return static_cast<
-            const typename get_tuple<N, type>::type*>(this)->get();
+        return static_cast<const typename get_tuple<N, type>::type*>(this)->get();
     }
 
 #if __cplusplus >= 201402L
-    void print_elems() const {
-        _print_elems(
-            static_cast<std::make_index_sequence<sizeof...(Tail)+1>*>(nullptr));
+    void print() const {
+        _print(static_cast<std::make_index_sequence<sizeof...(Tail)+1>*>(nullptr));
     }
 #else
-    void print_elems() const {
-        _print_elems<0>(this);
+    void print() const {
+        _print<0>(this);
     }
 #endif
 
 private:
-    Head&& h; // Head lvalue with possible references to Head rvalues
+    elem_type elem;
 
-    // C++ standard specific print_elems() helpers
+    // C++ standard specific print() helpers
 #if __cplusplus >= 201402L
     /*
      * Print tuple elements via expanding integer indexes passed by
      * integer_sequence type (C++14).
      */
     template<std::size_t ...Indexes>
-    void _print_elems(std::integer_sequence<std::size_t, Indexes...>*) const
+    void _print(std::integer_sequence<std::size_t, Indexes...>*) const
     {
         // use initializer_list to ensure proper elements order
         auto l = {(std::cout << "#" << Indexes << ": " <<
@@ -133,35 +143,19 @@ private:
 
     // final recursion (constexpr function returns 0 to make C++11 compiler happy)
     template<std::size_t I>
-    static constexpr std::size_t _print_elems(const TupleEnd*) {
+    static constexpr std::size_t _print(const TupleEnd*) {
         return 0;
     }
 
     template<std::size_t I, typename ...Types>
-    static void _print_elems(const _Tuple<_TypesList<Types...>> *t)
+    static void _print(const _Tuple<_TypesList<Types...>> *t)
     {
         std::cout << "#" << I << ": " << t->get() << "\n";
-        _print_elems<I+1>(static_cast<
+        _print<I+1>(static_cast<
             const typename _Tuple<_TypesList<Types...>>::next*>(t));
     }
 #endif
 };
-
-#if __cplusplus >= 201703L
-template<std::size_t N, typename Tuple>
-struct _tuple_element;
-
-template<std::size_t N, typename... Types>
-struct _tuple_element<N, _Tuple<_TypesList<Types...>>>
-{
-private:
-    static_assert(N >= 0 && N < sizeof...(Types), "Invalid depth");
-    using tuple_type = typename get_tuple<N, _Tuple<_TypesList<Types...>>>::type;
-
-public:
-    using type = decltype(std::declval<tuple_type>().get());
-};
-#endif
 
 } // detail namespace
 
@@ -181,8 +175,7 @@ detail::_Tuple<detail::_TypesList<Types...>> make_tuple(Types&&... args)
  * structured binding).
  *
  * NOTE: To not mess the std namespace by 'using function_alt::XYZ' full
- * symbols specification is provided here but main implementation of
- * tuple_element is provided by _tuple_element base class.
+ * symbols specification is provided here.
  */
 namespace std {
 
@@ -194,10 +187,14 @@ struct tuple_size<
 
 template<size_t N, typename... Types>
 struct tuple_element<
-        N, tuple_alt::detail::_Tuple<tuple_alt::detail::_TypesList<Types...>>>:
-    tuple_alt::detail::_tuple_element<
-        N, tuple_alt::detail::_Tuple<tuple_alt::detail::_TypesList<Types...>>>
-{};
+    N, tuple_alt::detail::_Tuple<tuple_alt::detail::_TypesList<Types...>>>
+{
+    static_assert(N >= 0 && N < sizeof...(Types), "Invalid depth");
+
+    using type = typename tuple_alt::get_tuple<N,
+             tuple_alt::detail::_Tuple<tuple_alt::detail::_TypesList<Types...>>>
+         ::type::elem_type;
+};
 
 } // std namespace
 #endif
@@ -209,49 +206,63 @@ struct tuple_element<
 namespace tuple_alt {
 
 static void f() {}
-struct A {
-    A() = default;
 
-    // to make sure no extra A copies are performed
-    A(const A&) = delete;
-    A(A&&) = delete;
+struct A
+{
+    int a = 0;
+    int get() { return a; }
+
+    A() = default;
+    A(int a): a(a) {}
+
+    // required since A xvalue is stored by copy
+    A(const A&) = default;
+    A(A&&) = default;
 };
 
 std::ostream& operator<<(std::ostream& os, const A& a)
 {
-    std::cout <<
-        "struct A lvalue" << " addr: " << reinterpret_cast<const void*>(&a);
+    std::cout << "struct A lvalue: " << a.a <<
+        " [" << reinterpret_cast<const void*>(&a) << "]";
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const A&& a)
 {
-    std::cout <<
-        "struct A rvalue" << " addr: " << reinterpret_cast<const void*>(&a);
+    std::cout << "struct A rvalue: " << a.a <<
+        " [" << reinterpret_cast<const void*>(&a) << "]";
     return os;
 }
 
 void test()
 {
-    int i = 3;
-    double d = 4.5;
-    char str[] = "RW-string";
-    int *pi = &i;
-
     A a;
+    int i = 3;
+    const double d = 4.5;
+    char str[] = "string";
+    int *pi = &i;
+    int A::*mp = &A::a;
+    int (A::*mfp)() = &A::get;
+
     auto t = make_tuple(
-        1,              // 0
-        2.5,            // 1
-        "RO-string",    // 2
-        i,              // 3
-        d,              // 4
-        str,            // 5
-        pi,             // 6
-        f,              // 7
-        a,              // 8
-        A{}             // 9
+        1,              // 0: prvalue -> stored by const copy
+        2.5,            // 1: prvalue
+        "const string", // 2: const lvalue -> stored as is
+        i,              // 3: lvalue -> stored as is
+        d,              // 4: const lvalue
+        str,            // 5: lvalue
+        pi,             // 6: lvalue
+        f,              // 7: lvalue
+        a,              // 8: lvalue
+        A(1),           // 9: xvalue -> stored by copy
+        &A::a,          // 10: prvalue
+        &A::get,        // 11: prvalue
+        mp,             // 12: lvalue
+        mfp,            // 13: lvalue
+        nullptr,        // 14: prvalue
+        (void*)1        // 15: prvalue
     );
-    t.print_elems();
+    t.print();
 
     std::cout << "\n";
 
@@ -265,23 +276,62 @@ void test()
     std::cout << "\n";
 
     // structured binding test
-    auto& [e0, e1, e2, e3, e4, e5, e6, e7, e8, e9] = t;
-    std::cout << "#0: " << e0 << "\n";
-    std::cout << "#1: " << e1 << "\n";
-    std::cout << "#2: " << e2 << "\n";
-    std::cout << "#3: " << e3 << "\n";
-    std::cout << "#4: " << e4 << "\n";
-    std::cout << "#5: " << e5 << "\n";
-    std::cout << "#6: " << e6 << "\n";
-    std::cout << "#7: " << e7 << "\n";
-    std::cout << "#8: " << e8 << "\n";
-    std::cout << "#9: " << e9 << "\n";
+    auto& [e0, e1, e2, e3, e4, e5, e6, e7,
+        e8, e9, e10, e11, e12, e13, e14, e15] = t;
+
+    std::cout << "#0: " << e0 << ", type check: "
+        << std::is_same<decltype(e0), const int>::value << "\n";
+    std::cout << "#1: " << e1 << ", type check: "
+        << std::is_same<decltype(e1), const double>::value << "\n";
+    std::cout << "#2: " << e2 << ", type check: " <<
+        std::is_same<decltype(e2), const char(&)[13]>::value << "\n";
+    std::cout << "#3: " << e3 << ", type check: " <<
+        std::is_same<decltype(e3), int&>::value << "\n";
+    std::cout << "#4: " << e4 << ", type check: " <<
+        std::is_same<decltype(e4), const double&>::value << "\n";
+    std::cout << "#5: " << e5 << ", type check: " <<
+        std::is_same<decltype(e5), char (&)[7]>::value << "\n";
+    std::cout << "#6: " << e6 << ", type check: " <<
+        std::is_same<decltype(e6), int*&>::value << "\n";
+    std::cout << "#7: " << e7 << ", type check: " <<
+        std::is_same<decltype(e7), void(&)(void)>::value << "\n";
+    std::cout << "#8: " << e8 << ", type check: " <<
+        std::is_same<decltype(e8), A&>::value << "\n";
+    std::cout << "#9: " << e9 << ", type check: " <<
+        std::is_same<decltype(e9), A>::value << "\n";
+    std::cout << "#10: " << e10 << ", type check: " <<
+        std::is_same<decltype(e10), int A::* const>::value << "\n";
+    std::cout << "#11: " << e11 << ", type check: " <<
+        std::is_same<decltype(e11), int (A::* const)()>::value << "\n";
+    std::cout << "#12: " << e12 << ", type check: " <<
+        std::is_same<decltype(e12), int A::*&>::value << "\n";
+    std::cout << "#13: " << e13 << ", type check: " <<
+        std::is_same<decltype(e13), int (A::*&)()>::value << "\n";
+    std::cout << "#14: " << e14 << ", type check: " <<
+        std::is_same<decltype(e14), const std::nullptr_t>::value << "\n";
+    std::cout << "#15: " << e15 << ", type check: " <<
+        std::is_same<decltype(e15), void* const>::value << "\n";
 
     std::cout << "\n";
 
+    // ERROR: const lvalue
+    // e2[0] = 'x';
+
     // e3 is a reference to i
     e3++;
-    std::cout << "#3: " << e3 << ", i: " << i << "\n";
+    std::cout << "#3: " << e3 << " [" << &e3 << "], i: " <<
+        i << "[" << &i << "]\n";
+
+    std::cout << "#5: " << e5 << " [" << &e5 << "], str: " <<
+        str << " [" << reinterpret_cast<void*>(str) << "]\n";
+
+    // e8 is a reference to a
+    e8.a--;
+    std::cout << "#8: " << e8.a << " [" << &e8 << "], a: " <<
+        a.a << " [" << &a << "]\n";
+
+    // e9 is a copy of passed A xvalue
+    std::cout << "#9: " << e9.a << " [" << &e9 << "]\n";
 #endif
 }
 
