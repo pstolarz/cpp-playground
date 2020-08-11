@@ -86,7 +86,7 @@ private:
         Functor(F&& f)
         {
             // move rvalue to a new object
-            this->f = new F(std::move(f));
+            this->f = new typename std::decay<F>::type(std::move(f));
             alloced = true;
         };
 
@@ -172,13 +172,13 @@ public:
     }
 
     // class with operator()
-    template<typename F, typename Fd = typename std::decay<F>::type>
+    template<typename F, typename Fd = typename std::remove_reference<F>::type>
     Function(F&& f)
     {
         _functor = new Functor<Fd>(std::forward<decltype(f)>(f));
     }
 
-    template<typename F, typename Fd = typename std::decay<F>::type>
+    template<typename F, typename Fd = typename std::remove_reference<F>::type>
     Function& operator= (F&& f)
     {
         delete _functor;
@@ -240,7 +240,7 @@ _MembPtr<T, F, B> memb_ptr(T *t, F B::*f)
 }
 
 template<typename T, typename F, typename B,
-    typename Td = typename std::decay<T>::type>
+    typename Td = typename std::remove_reference<T>::type>
 _MembPtr<Td, F, B> memb_ptr(T& t, F B::*f)
 {
     return _MembPtr<Td, F, B>(&t, f);
