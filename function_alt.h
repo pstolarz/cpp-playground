@@ -26,7 +26,7 @@ struct _MembPtr
         t(t), f(f), alloced(alloced)
     {}
 
-    // _MembPtr is unique
+    // _MembPtr object is unique
     _MembPtr(const _MembPtr&) = delete;
     _MembPtr& operator= (const _MembPtr&) = delete;
 
@@ -80,6 +80,8 @@ private:
     {
         F *f = nullptr;
         bool alloced = false;
+
+        Functor(F *f): f(f) {};
 
         Functor(F& f): f(&f) {};
 
@@ -149,7 +151,7 @@ public:
     // require use operator= afterwards
     explicit Function() = default;
 
-    // Function is unique
+    // Function object is unique
     Function(const Function&) = delete;
     Function& operator= (const Function&) = delete;
 
@@ -179,10 +181,24 @@ public:
     }
 
     template<typename F, typename Fd = typename std::remove_reference<F>::type>
+    Function(F *f)
+    {
+        _functor = new Functor<Fd>(f);
+    }
+
+    template<typename F, typename Fd = typename std::remove_reference<F>::type>
     Function& operator= (F&& f)
     {
         delete _functor;
         _functor = new Functor<Fd>(std::forward<decltype(f)>(f));
+        return *this;
+    }
+
+    template<typename F, typename Fd = typename std::remove_reference<F>::type>
+    Function& operator= (F *f)
+    {
+        delete _functor;
+        _functor = new Functor<Fd>(*f);
         return *this;
     }
 
@@ -212,16 +228,16 @@ public:
 
     // member function call
     template<typename T, typename F, typename B>
-    Function(const _MembPtr<T, F, B>& mp)
+    Function(const _MembPtr<T, F, B>&& mp)
     {
-        _functor = new Functor<_MembPtr<T, F, B>>(mp);
+        _functor = new Functor<_MembPtr<T, F, B>>(std::forward<decltype(mp)>(mp));
     }
 
     template<typename T, typename F, typename B>
-    Function& operator= (const _MembPtr<T, F, B>& mp)
+    Function& operator= (const _MembPtr<T, F, B>&& mp)
     {
         delete _functor;
-        _functor = new Functor<_MembPtr<T, F, B>>(mp);
+        _functor = new Functor<_MembPtr<T, F, B>>(std::forward<decltype(mp)>(mp));
         return *this;
     }
 
@@ -330,7 +346,7 @@ void test(void)
     Function<int(int, int&)> func;
 
     S1 s1;
-    func = s1;
+    func = s1;  // &s1 also possible
     sum = func(i, j);
     print_res(sum, i, j);
 
