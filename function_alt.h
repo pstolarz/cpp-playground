@@ -13,22 +13,29 @@ namespace {
 template<typename T, typename F, typename B>
 struct _MembPtr
 {
-    T *t;
-    F B::*f;
-    bool alloced;
+    T *t = nullptr;
+    F B::*f = nullptr;
+    bool alloced = false;
 
     static_assert(std::is_base_of<B, T>::value,
         "Member function declared to be called on wrong object");
 
     _MembPtr() = delete;
 
-    _MembPtr(T *t, F B::*f, bool alloced = false):
-        t(t), f(f), alloced(alloced)
-    {}
-
     // _MembPtr object is unique
     _MembPtr(const _MembPtr&) = delete;
     _MembPtr& operator= (const _MembPtr&) = delete;
+
+    _MembPtr(T *t, F B::*f): t(t), f(f) {}
+
+    _MembPtr(T& t, F B::*f): t(&t), f(f) {}
+
+    _MembPtr(T&& t, F B::*f): f(f)
+    {
+        // move rvalue to a new object
+        this->t = new T(std::move(t));
+        alloced = true;
+    }
 
     _MembPtr(_MembPtr&& mp):
         t(mp.t), f(mp.f), alloced(mp.alloced)
@@ -259,17 +266,14 @@ template<typename T, typename F, typename B,
     typename Td = typename std::remove_reference<T>::type>
 _MembPtr<Td, F, B> memb_ptr(T& t, F B::*f)
 {
-    return _MembPtr<Td, F, B>(&t, f);
+    return _MembPtr<Td, F, B>(t, f);
 }
 
 template<typename T, typename F, typename B,
     typename Td = typename std::remove_reference<T>::type>
 _MembPtr<Td, F, B> memb_ptr(T&& t, F B::*f)
 {
-    return _MembPtr<Td, F, B>(
-        // move rvalue to a new object
-        new Td(std::move(t)),
-        f, true);
+    return _MembPtr<Td, F, B>(std::forward<decltype(t)>(t), f);
 }
 
 
