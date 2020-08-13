@@ -1,9 +1,9 @@
+#ifndef __FUNCTION_ALT_H__
+#define __FUNCTION_ALT_H__
+
 #include <cstring>
 #include <functional>   // std::bad_function_call exception
 #include <type_traits>
-
-#ifndef __FUNCTION_ALT_H__
-#define __FUNCTION_ALT_H__
 
 namespace function_alt {
 

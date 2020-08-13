@@ -48,13 +48,13 @@ struct chk_sfinae
 
 void test()
 {
-    printf("Class-template spec. check:\n");
-    printf("  Check int*  : %d\n", chk_spec<int>::value);
-    printf("  Check int&* : %d\n", chk_spec<int&>::value);
+    std::cout << "Class-template spec. check:\n";
+    std::cout << "  Check int*  : " << chk_spec<int>::value << "\n";
+    std::cout << "  Check int&* : " << chk_spec<int&>::value << "\n";
 
-    printf("SFINAE check:\n");
-    printf("  Check int*  : %d\n", chk_sfinae<int>::value);
-    printf("  Check int&* : %d\n", chk_sfinae<int&>::value);
+    std::cout << "SFINAE check:\n";
+    std::cout << "  Check int*  : " << chk_sfinae<int>::value << "\n";
+    std::cout << "  Check int&* : " << chk_sfinae<int&>::value << "\n";
 }
 
 } // namespace check_type_expr

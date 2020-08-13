@@ -5,18 +5,18 @@ namespace refs {
 
 template<typename T>
 static void _f_ref(T& t) {
-    printf("ref_test(T&)\n");
+    std::cout << "ref_test(T&)\n";
 
     t++;
-    printf("  i:%d [%p]\n", t, &t);
+    std::cout << "  i:" << t << " [" << &t << "]\n";
 }
 
 template<typename T>
 static void _f_ref(T&& t) {
-    printf("ref_test(T&&)\n");
+    std::cout << ("ref_test(T&&)\n");
 
     t++;
-    printf("  i:%d [%p]\n", t, &t);
+    std::cout << "  i:" << t << " [" << &t << "]\n";
 }
 
 struct A {};
@@ -41,7 +41,7 @@ void test()
     int&& i = 0;    // prvalue
 
     i++;
-    printf("i:%d [%p]\n", i, &i);
+    std::cout << "i:" << i << " [" << &i << "]\n";
 
     _f_ref(i);                              // calls T&
     _f_ref(std::forward<decltype(i)>(i));   // calls T&&
@@ -60,6 +60,7 @@ void test()
     k = a;                  // OK: k treated as lvalue
 
     A&& l = A{};    // xvalue
+    (void)l;        // get rid of compiler warning
 }
 
 } // namespace refs

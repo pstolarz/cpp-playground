@@ -1,9 +1,9 @@
 #ifndef __TUPLE_ALT_H__
 #define __TUPLE_ALT_H__
 
-#include <type_traits>
 // C++14 std::integer_sequence, C++17 std::tuple_size, std::tuple_element
 #include <utility>
+#include <type_traits>
 
 namespace tuple_alt {
 
@@ -286,7 +286,7 @@ void test()
         mp,                 // 15: lvalue
         mfp,                // 16: lvalue
         nullptr,            // 17: prvalue
-        (void*)1,           // 18: prvalue
+        (void*)-1,          // 18: prvalue
         !pi,                // 19: prvalue
         make_tuple(0, 1.2)  // 20: xvalue
     );
@@ -320,9 +320,9 @@ void test()
         std::is_same<decltype(e4), const double&>::value << "\n";
     std::cout << "#5: " << e5 << ", type check: " <<
         std::is_same<decltype(e5), char (&)[7]>::value << "\n";
-    std::cout << "#6: " << e6 << ", type check: " <<
+    std::cout << "#6: [" << e6 << "], type check: " <<
         std::is_same<decltype(e6), int*&>::value << "\n";
-    std::cout << "#7: " << e7 << ", type check: " <<
+    std::cout << "#7: [" << reinterpret_cast<void*>(&e7) << "], type check: " <<
         std::is_same<decltype(e7), void(&)(void)>::value << "\n";
     std::cout << "#8: " << e8 << ", type check: " <<
         std::is_same<decltype(e8), A&>::value << "\n";
@@ -344,12 +344,13 @@ void test()
         std::is_same<decltype(e16), int (A::*&)()>::value << "\n";
     std::cout << "#17: " << e17 << ", type check: " <<
         std::is_same<decltype(e17), const std::nullptr_t>::value << "\n";
-    std::cout << "#18: " << e18 << ", type check: " <<
+    std::cout << "#18: [" << e18 << "], type check: " <<
         std::is_same<decltype(e18), void* const>::value << "\n";
     std::cout << "#19: " << e19 << ", type check: " <<
         std::is_same<decltype(e19), const bool>::value << "\n";
     std::cout << "#20: " << e20 << ", type check: " <<
-        std::is_same<decltype(e20), detail::_Tuple<detail::_TypesList<int, double>>>::value << "\n";
+        std::is_same<decltype(e20),
+            detail::_Tuple<detail::_TypesList<int, double>>>::value << "\n";
 
     std::cout << "\n";
 

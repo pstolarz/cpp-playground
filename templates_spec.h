@@ -96,7 +96,7 @@ struct tm_5<int, T> {};
 template<int I, int N>
 struct Loop: Loop<I+1, N> {
     void exe() {
-        printf("%d\n", I);
+        std::cout << I << "\n";
         Loop<I+1, N>::exe();
     }
 };
@@ -104,29 +104,29 @@ struct Loop: Loop<I+1, N> {
 template<int N>
 struct Loop<N, N> {
     void exe() {
-        printf("%d\n", N);
+        std::cout << N << "\n";
     }
 };
 
 void test()
 {
-    printf("%s\n", tm_2<1, 2>::name);
-    printf("%s\n", tm_2<1, 1>::name);
-    printf("%s\n", tm_2<3, 3>::name);
-    printf("\n");
+    std::cout << tm_2<1, 2>::name << "\n";
+    std::cout << tm_2<1, 1>::name << "\n";
+    std::cout << tm_2<3, 3>::name << "\n";
+    std::cout << "\n";
 
-    printf("%s\n", tm_3<int, float, void>::name);
-    printf("%s\n", tm_3<int, int, int>::name);
-    printf("%s\n", tm_3<int>::name);
-    printf("\n");
+    std::cout << tm_3<int, float, void>::name << "\n";
+    std::cout << tm_3<int, int, int>::name << "\n";
+    std::cout << tm_3<int>::name << "\n";
+    std::cout << "\n";
 
-    printf("%s\n", tm_4<int, int>::name);
-    printf("%s\n", tm_4<>::name);
-    printf("\n");
+    std::cout << tm_4<int, int>::name << "\n";
+    std::cout << tm_4<>::name << "\n";
+    std::cout << "\n";
 
-    printf("%s\n", tm_5<int>::name);
-    printf("%s\n", tm_5<int, int>::name);
-    printf("\n");
+    std::cout << tm_5<int>::name << "\n";
+    std::cout << tm_5<int, int>::name << "\n";
+    std::cout << "\n";
 
     Loop<5, 9> l;
     l.exe();

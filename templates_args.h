@@ -5,13 +5,14 @@ namespace templates_args {
 
 template <typename> struct f_args;
 
-template <typename F, typename... ArgTypes>
-struct f_args<F(ArgTypes...)> {
-    using type = F;
+template <typename R, typename... ArgTypes>
+struct f_args<R(ArgTypes...)> {
+    using type = R;
     static const int size = static_cast<int>(sizeof...(ArgTypes));
 };
 
 int f(int, int&);
+
 struct A {
     int m;
     int f(int, int&);
@@ -26,10 +27,10 @@ struct in_class<T C::*>
     using class_type = C;
 };
 
-template <typename T, typename C, typename ...Args>
-struct in_class<T (C::*)(Args...)>
+template <typename R, typename C, typename ...Args>
+struct in_class<R (C::*)(Args...)>
 {
-    using type = T;
+    using type = R;
     using class_type = C;
 };
 
@@ -45,57 +46,56 @@ void test()
     using pf_t = f_t*;
     using rf_t = f_t&;
 
-    printf("f_t: int:%d, Args:%d\n",
-        std::is_same<f_args<f_t>::type, int>::value,
-        f_args<f_t>::size);
-    printf("f_t: int(int, int&):%d, Args:%d\n",
-        std::is_same<f_args<f_t>::type,
-        int(int, int&)>::value, f_args<f_t>::size);
+    std::cout << "f_t: int:" << std::is_same<f_args<f_t>::type, int>::value <<
+        ", Args:" << f_args<f_t>::size << "\n";
+    std::cout << "f_t: int(int, int&):" <<
+        std::is_same<f_args<f_t>::type, int(int, int&)>::value <<
+        ", Args:" << f_args<f_t>::size << "\n";
 
-    printf("\n");
+    std::cout << "\n";
 
-    printf("pf_t: int(*)(int, int&):%d\n",
-        std::is_same<pf_t, int(*)(int, int&)>::value);
-    printf("pf_t(int, int&): int(*)(int, int&):%d, Args:%d\n",
-        std::is_same<f_args<pf_t(int, int&)>::type, int(*)(int, int&)>::value,
-        f_args<pf_t(int, int&)>::size);
-    printf("pf_t(): int(*)(int, int&):%d, Args:%d\n",
-        std::is_same<f_args<pf_t()>::type, int(*)(int, int&)>::value,
-        f_args<pf_t()>::size);
+    std::cout << "pf_t: int(*)(int, int&):" <<
+        std::is_same<pf_t, int(*)(int, int&)>::value << "\n",
+    std::cout << "pf_t(int, int&): int(*)(int, int&):" <<
+        std::is_same<f_args<pf_t(int, int&)>::type, int(*)(int, int&)>::value <<
+        ", Args:" << f_args<pf_t(int, int&)>::size << "\n";
+    std::cout << "pf_t(): int(*)(int, int&):" <<
+        std::is_same<f_args<pf_t()>::type, int(*)(int, int&)>::value <<
+        ", Args:" << f_args<pf_t()>::size << "\n";
 
-    printf("\n");
+    std::cout << "\n";
 
-    printf("rf_t(double): int(&)(int, int&):%d, Args:%d\n",
-        std::is_same<f_args<rf_t(double)>::type, int(&)(int, int&)>::value,
-        f_args<rf_t(double)>::size);
+    std::cout << "rf_t(double): int(&)(int, int&):" <<
+        std::is_same<f_args<rf_t(double)>::type, int(&)(int, int&)>::value <<
+        ", Args:" << f_args<rf_t(double)>::size << "\n";
 
     using pmf_t = decltype(&A::f);
     // using mf_t = std::remove_pointer<pmf_t>;
     // using rmf_t = mf_t&;
 
-    printf("\n");
+    std::cout << "\n";
 
-    printf("pmf_t(void*): int (A::*)(int, int&):%d, Args:%d\n",
-        std::is_same<f_args<pmf_t(void*)>::type, int (A::*)(int, int&)>::value,
-        f_args<pmf_t(void*)>::size);
+    std::cout << "pmf_t(void*): int (A::*)(int, int&):" <<
+        std::is_same<f_args<pmf_t(void*)>::type, int (A::*)(int, int&)>::value <<
+        ", Args:" << f_args<pmf_t(void*)>::size << "\n";
 
-    printf("\n");
+    std::cout << "\n";
 
-    printf("in_class_m pmf_t: f_t:%d, class A:%d\n",
-        std::is_same<in_class_m<pmf_t>::type, f_t>::value,
-        std::is_same<in_class_m<pmf_t>::class_type, A>::value);
-    
-    printf("in_class_f pmf_t: int:%d, class A:%d\n",
-        std::is_same<in_class_f<pmf_t>::type, int>::value,
-        std::is_same<in_class_f<pmf_t>::class_type, A>::value);
+    std::cout << "in_class_m pmf_t: f_t:" <<
+        std::is_same<in_class_m<pmf_t>::type, f_t>::value << ", class A:" <<
+        std::is_same<in_class_m<pmf_t>::class_type, A>::value << "\n";
 
-    printf("\n");
+    std::cout << "in_class_f pmf_t: int:" <<
+        std::is_same<in_class_f<pmf_t>::type, int>::value << ", class A:" <<
+        std::is_same<in_class_f<pmf_t>::class_type, A>::value << "\n";
+
+    std::cout << "\n";
 
     using pmm_t = decltype(&A::m);
 
-    printf("in_class_m pmm_t: int:%d, class A:%d\n",
-        std::is_same<in_class_m<pmm_t>::type, int>::value,
-        std::is_same<in_class_m<pmm_t>::class_type, A>::value);
+    std::cout << "in_class_m pmm_t: int:" <<
+        std::is_same<in_class_m<pmm_t>::type, int>::value << ", class A:" <<
+        std::is_same<in_class_m<pmm_t>::class_type, A>::value << "\n";
 }
 
 } // namespace templates_args

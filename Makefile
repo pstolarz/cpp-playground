@@ -18,4 +18,4 @@ clean:
 	rm -f main
 
 main: main.cpp $(HEADERS)
-	$(CC) $(CFLAGS) $< -o $@ --std=c++2a -lstdc++
+	$(CC) $(CFLAGS) -Wall $< -o $@ --std=c++2a -lstdc++

@@ -2,7 +2,6 @@
 #define __MEM_PTR_H__
 
 #include <type_traits>
-#include <stdio.h>
 
 namespace member_ptr {
 
@@ -13,33 +12,31 @@ struct C : A, B {};
 
 void test(void)
 {
-    printf("decltype(&C::a) == int C::* is %d\n",
-        std::is_same<decltype(&C::a), int C::*>::value);
-    printf("decltype(&C::a) == int C::A::* == int A::* is %d\n",
-        std::is_same<decltype(&C::a), int C::A::*>::value &&
-        std::is_same<decltype(&C::a), int A::*>::value);
-
-    /*
-     * The following printf's causes warnings related to usage
-     * pointer-to-class-member while formatting to %d
-     * (C++ doesn't allow to cast such pointers to integer type).
-     */
+    std::cout << "decltype(&C::a) == int C::* is " <<
+        std::is_same<decltype(&C::a), int C::*>::value << "\n",
+    std::cout << "decltype(&C::a) == int C::A::* == int A::* is " <<
+        (std::is_same<decltype(&C::a), int C::A::*>::value &&
+         std::is_same<decltype(&C::a), int A::*>::value) << "\n";
 
     int C::*pmC = &C::a;
-    printf("decltype(pmC) == int C::* is %d; pmC as &C::a value: %d\n",
-        std::is_same<decltype(pmC), int C::*>::value, pmC);
+    std::cout << "decltype(pmC) == int C::* is " <<
+        std::is_same<decltype(pmC), int C::*>::value <<
+        "; pmC as &C::a value: " << pmC << "\n";
 
     int A::*pmA = &C::A::a;
-    printf("decltype(pmA) == int A::* is %d; pmA as &C::A::a value: %d\n",
-        std::is_same<decltype(pmA), int A::*>::value, pmA);
+    std::cout << "decltype(pmA) == int A::* is "<<
+        std::is_same<decltype(pmA), int A::*>::value <<
+        "; pmA as &C::A::a value: " << pmA << "\n";
 
     pmC = &C::b;
-    printf("decltype(pmC) == int C::* is %d; pmC as &C::b value: %d\n",
-        std::is_same<decltype(pmC), int C::*>::value, pmC);
+    std::cout << "decltype(pmC) == int C::* is " <<
+        std::is_same<decltype(pmC), int C::*>::value <<
+        "; pmC as &C::b value: " << pmC << "\n";
 
     int B::*pmB = &C::B::b;
-    printf("decltype(pmB) == int B::* is %d; pmB as &C::B::b value: %d\n",
-        std::is_same<decltype(pmB), int B::*>::value, pmB);
+    std::cout << "decltype(pmB) == int B::* is " <<
+        std::is_same<decltype(pmB), int B::*>::value <<
+        "; pmB as &C::B::b value: " << pmB << "\n";
 }
 
 } // namespace member_ptr
