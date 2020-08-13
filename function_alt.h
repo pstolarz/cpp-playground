@@ -5,6 +5,16 @@
 #include <functional>   // std::bad_function_call exception
 #include <type_traits>
 
+/*
+ * If configured - no dynamic memory allocation is performed.
+ *
+ * In this case it's not possible to pass rvalue (xvalue) object to Function,
+ * since this would require moving the rvalue to a newly allocated object.
+ */
+#ifndef NO_DYNAMIC_ALLOCS
+# define NO_DYNAMIC_ALLOCS  0
+#endif
+
 namespace function_alt {
 
 namespace {
@@ -15,7 +25,6 @@ struct _MembPtr
 {
     T *t = nullptr;
     F B::*f = nullptr;
-    bool alloced = false;
 
     static_assert(std::is_base_of<B, T>::value,
         "Member function declared to be called on wrong object");
@@ -30,6 +39,12 @@ struct _MembPtr
 
     _MembPtr(T& t, F B::*f): t(&t), f(f) {}
 
+#if NO_DYNAMIC_ALLOCS
+    _MembPtr(_MembPtr&& mp) = default;
+    _MembPtr& operator= (_MembPtr&& mp) = default;
+#else
+    bool alloced = false;
+
     _MembPtr(T&& t, F B::*f): f(f)
     {
         // move rvalue to a new object
@@ -37,12 +52,9 @@ struct _MembPtr
         alloced = true;
     }
 
-    _MembPtr(_MembPtr&& mp):
-        t(mp.t), f(mp.f), alloced(mp.alloced)
+    _MembPtr(_MembPtr&& mp)
     {
-        mp.t = nullptr;
-        mp.f = nullptr;
-        mp.alloced = false;
+        operator=(std::forward<decltype(mp)>(mp));
     }
 
     _MembPtr& operator= (_MembPtr&& mp)
@@ -54,6 +66,8 @@ struct _MembPtr
         mp.t = nullptr;
         mp.f = nullptr;
         mp.alloced = false;
+
+        return *this;
     }
 
     ~_MembPtr() {
@@ -64,6 +78,7 @@ struct _MembPtr
         t = nullptr;
         f = nullptr;
     }
+#endif
 };
 
 } // unnamed namespace
@@ -86,11 +101,15 @@ private:
     struct Functor: FunctorBase
     {
         F *f = nullptr;
-        bool alloced = false;
 
         Functor(F *f): f(f) {};
 
         Functor(F& f): f(&f) {};
+
+#if NO_DYNAMIC_ALLOCS
+        Functor(F&& f): f(&f) {}
+#else
+        bool alloced = false;
 
         Functor(F&& f)
         {
@@ -106,7 +125,7 @@ private:
             }
             f = nullptr;
         }
-
+#endif
         Res operator() (Args... args) const
             // exception spec. taken from passed functor
             noexcept(noexcept((*f)(args...)))
@@ -152,6 +171,28 @@ private:
         }
     };
 
+#if NO_DYNAMIC_ALLOCS
+    // trivial max() implementation calculated on compilation time
+    // (std::max() is not constexpr for C++11)
+    template<typename T, T arg1, T arg2, T... args>
+    struct max: max<T, (arg1 >= arg2 ? arg1 : arg2), args...> {};
+
+    template<typename T, T arg1, T arg2>
+    struct max<T, arg1, arg2> {
+        static constexpr T value = (arg1 >= arg2 ? arg1 : arg2);
+    };
+
+    // used for compilation time calculations
+    struct _dummy { Res operator()(Args...); };
+
+    uint8_t _functor_sp[
+        max<std::size_t,
+            sizeof(Functor<_dummy>),
+            sizeof(Functor<Res(*)(Args...)>),
+            sizeof(Functor<_MembPtr<_dummy, Res(Args...), _dummy>>)>::value
+    ];
+#endif
+
     FunctorBase *_functor = nullptr;
 
 public:
@@ -172,11 +213,16 @@ public:
     {
         _functor = f._functor;
         f._functor = nullptr;
+        return *this;
     }
 
     ~Function()
     {
+#if NO_DYNAMIC_ALLOCS
+        if (_functor) _functor->~FunctorBase();
+#else
         delete _functor;
+#endif
         _functor = nullptr; 
     }
 
@@ -184,28 +230,54 @@ public:
     template<typename F, typename Fd = typename std::remove_reference<F>::type>
     Function(F&& f)
     {
+#if NO_DYNAMIC_ALLOCS
+        static_assert(sizeof(Functor<Fd>) <= sizeof(_functor_sp),
+            "Memory space mismatch");
+        _functor = new (_functor_sp) Functor<Fd>(std::forward<decltype(f)>(f));
+#else
         _functor = new Functor<Fd>(std::forward<decltype(f)>(f));
+#endif
     }
 
     template<typename F, typename Fd = typename std::remove_reference<F>::type>
     Function(F *f)
     {
+#if NO_DYNAMIC_ALLOCS
+        static_assert(sizeof(Functor<Fd>) <= sizeof(_functor_sp),
+            "Memory space mismatch");
+        _functor = new (_functor_sp) Functor<Fd>(f);
+#else
         _functor = new Functor<Fd>(f);
+#endif
     }
 
     template<typename F, typename Fd = typename std::remove_reference<F>::type>
     Function& operator= (F&& f)
     {
+#if NO_DYNAMIC_ALLOCS
+        static_assert(sizeof(Functor<Fd>) <= sizeof(_functor_sp),
+            "Memory space mismatch");
+        if (_functor) _functor->~FunctorBase();
+        _functor = new (_functor_sp) Functor<Fd>(std::forward<decltype(f)>(f));
+#else
         delete _functor;
         _functor = new Functor<Fd>(std::forward<decltype(f)>(f));
+#endif
         return *this;
     }
 
     template<typename F, typename Fd = typename std::remove_reference<F>::type>
     Function& operator= (F *f)
     {
+#if NO_DYNAMIC_ALLOCS
+        static_assert(sizeof(Functor<Fd>) <= sizeof(_functor_sp),
+            "Memory space mismatch");
+        if (_functor) _functor->~FunctorBase();
+        _functor = new (_functor_sp) Functor<Fd>(*f);
+#else
         delete _functor;
         _functor = new Functor<Fd>(*f);
+#endif
         return *this;
     }
 
@@ -218,7 +290,13 @@ public:
         static_assert(sizeof...(FArgs) == sizeof...(Args),
             "Calling arguments don't match");
 
+#if NO_DYNAMIC_ALLOCS
+        static_assert(sizeof(Functor<decltype(f)>) <= sizeof(_functor_sp),
+            "Memory space mismatch");
+        _functor = new (_functor_sp) Functor<decltype(f)>(f);
+#else
         _functor = new Functor<decltype(f)>(f);
+#endif
     }
 
     template<typename FRes, typename ...FArgs>
@@ -228,8 +306,15 @@ public:
         static_assert(sizeof...(FArgs) == sizeof...(Args),
             "Calling arguments don't match");
 
+#if NO_DYNAMIC_ALLOCS
+        static_assert(sizeof(Functor<decltype(f)>) <= sizeof(_functor_sp),
+            "Memory space mismatch");
+        if (_functor) _functor->~FunctorBase();
+        _functor = new (_functor_sp) Functor<decltype(f)>(f);
+#else
         delete _functor;
         _functor = new Functor<decltype(f)>(f);
+#endif
         return *this;
     }
 
@@ -237,14 +322,29 @@ public:
     template<typename T, typename F, typename B>
     Function(const _MembPtr<T, F, B>&& mp)
     {
+#if NO_DYNAMIC_ALLOCS
+        static_assert(sizeof(Functor<_MembPtr<T, F, B>>) <= sizeof(_functor_sp),
+            "Memory space mismatch");
+        _functor = new (_functor_sp)
+            Functor<_MembPtr<T, F, B>>(std::forward<decltype(mp)>(mp));
+#else
         _functor = new Functor<_MembPtr<T, F, B>>(std::forward<decltype(mp)>(mp));
+#endif
     }
 
     template<typename T, typename F, typename B>
     Function& operator= (const _MembPtr<T, F, B>&& mp)
     {
+#if NO_DYNAMIC_ALLOCS
+        static_assert(sizeof(Functor<_MembPtr<T, F, B>>) <= sizeof(_functor_sp),
+            "Memory space mismatch");
+        if (_functor) _functor->~FunctorBase();
+        _functor = new (_functor_sp)
+            Functor<_MembPtr<T, F, B>>(std::forward<decltype(mp)>(mp));
+#else
         delete _functor;
         _functor = new Functor<_MembPtr<T, F, B>>(std::forward<decltype(mp)>(mp));
+#endif
         return *this;
     }
 
@@ -350,7 +450,7 @@ void test(void)
     Function<int(int, int&)> func;
 
     S1 s1;
-    func = s1;  // &s1 also possible
+    func = s1;
     sum = func(i, j);
     print_res(sum, i, j);
 
@@ -358,7 +458,12 @@ void test(void)
     sum = func(i, j);
     print_res(sum, i, j);
 
+#if NO_DYNAMIC_ALLOCS
+    S2 s2;
+    func = memb_ptr(&s2, &S2::f);
+#else
     func = memb_ptr(S2(), &S2::f);
+#endif
     sum = func(i, j);
     print_res(sum, i, j);
 
@@ -374,7 +479,11 @@ void test(void)
     // ERROR: S1 is not derived from S2
     // func = memb_ptr(s1, &S2::f);
 
+#if NO_DYNAMIC_ALLOCS
+    auto lambda = [](int i, int& j) -> int
+#else
     func = [](int i, int& j) -> int
+#endif
     {
         std::cout << "lambda closure -> ";
         std::cout << "i: " << i << ", ";
@@ -382,6 +491,9 @@ void test(void)
 
         return i+j;
     };
+#if NO_DYNAMIC_ALLOCS
+    func = lambda;
+#endif
     sum = func(i, j);
     print_res(sum, i, j);
 
@@ -390,8 +502,8 @@ void test(void)
     // func(i, j);
 
     // Calls lambda once again. It's safe to call it again here even though
-    // the lambda was passed by rvalue, sine it has been moved and is stored
-    // inside Function object.
+    // the lambda is passed by rvalue, sine it is moved and stored inside
+    // Function object.
     func_mov(i, j);
     print_res(sum, i, j);
 
