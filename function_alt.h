@@ -10,6 +10,8 @@
  *
  * In this case it's not possible to pass rvalue (xvalue) object to Function,
  * since this would require moving the rvalue to a newly allocated object.
+ * No allocation configuration requires the caller to maintain an object on
+ * which the call in performed.
  */
 #ifndef NO_DYNAMIC_ALLOCS
 # define NO_DYNAMIC_ALLOCS  0
@@ -54,7 +56,7 @@ struct _MembPtr
 
     _MembPtr(_MembPtr&& mp)
     {
-        operator=(std::forward<decltype(mp)>(mp));
+        operator= (std::forward<decltype(mp)>(mp));
     }
 
     _MembPtr& operator= (_MembPtr&& mp)
@@ -171,6 +173,39 @@ private:
         }
     };
 
+    // helper routines for object initialization (via constructor or operator=)
+    template<typename _Functor, typename F>
+    Function& init(F&& f)
+    {
+#if NO_DYNAMIC_ALLOCS
+        static_assert(
+            sizeof(_Functor) <= sizeof(_functor_sp), "Memory space discrepancy");
+
+        if (_functor) _functor->~FunctorBase();
+        _functor = new (_functor_sp) _Functor(std::forward<decltype(f)>(f));
+#else
+        delete _functor;
+        _functor = new _Functor(std::forward<decltype(f)>(f));
+#endif
+        return *this;
+    }
+
+    template<typename _Functor, typename F>
+    Function& init(F *f)
+    {
+#if NO_DYNAMIC_ALLOCS
+        static_assert(
+            sizeof(_Functor) <= sizeof(_functor_sp), "Memory space discrepancy");
+
+        if (_functor) _functor->~FunctorBase();
+        _functor = new (_functor_sp) _Functor(f);
+#else
+        delete _functor;
+        _functor = new _Functor(f);
+#endif
+        return *this;
+    }
+
 #if NO_DYNAMIC_ALLOCS
     // trivial max() implementation calculated on compilation time
     // (std::max() is not constexpr for C++11)
@@ -205,8 +240,7 @@ public:
 
     Function(Function&& f)
     {
-        _functor = f._functor;
-        f._functor = nullptr;
+        operator= (std::forward<decltype(f)>(f));
     }
 
     Function& operator= (Function&& f)
@@ -230,55 +264,25 @@ public:
     template<typename F, typename Fd = typename std::remove_reference<F>::type>
     Function(F&& f)
     {
-#if NO_DYNAMIC_ALLOCS
-        static_assert(sizeof(Functor<Fd>) <= sizeof(_functor_sp),
-            "Memory space mismatch");
-        _functor = new (_functor_sp) Functor<Fd>(std::forward<decltype(f)>(f));
-#else
-        _functor = new Functor<Fd>(std::forward<decltype(f)>(f));
-#endif
+        init<Functor<Fd>>(std::forward<decltype(f)>(f));
     }
 
     template<typename F, typename Fd = typename std::remove_reference<F>::type>
     Function(F *f)
     {
-#if NO_DYNAMIC_ALLOCS
-        static_assert(sizeof(Functor<Fd>) <= sizeof(_functor_sp),
-            "Memory space mismatch");
-        _functor = new (_functor_sp) Functor<Fd>(f);
-#else
-        _functor = new Functor<Fd>(f);
-#endif
+        init<Functor<Fd>>(f);
     }
 
     template<typename F, typename Fd = typename std::remove_reference<F>::type>
     Function& operator= (F&& f)
     {
-#if NO_DYNAMIC_ALLOCS
-        static_assert(sizeof(Functor<Fd>) <= sizeof(_functor_sp),
-            "Memory space mismatch");
-        if (_functor) _functor->~FunctorBase();
-        _functor = new (_functor_sp) Functor<Fd>(std::forward<decltype(f)>(f));
-#else
-        delete _functor;
-        _functor = new Functor<Fd>(std::forward<decltype(f)>(f));
-#endif
-        return *this;
+        return init<Functor<Fd>>(std::forward<decltype(f)>(f));
     }
 
     template<typename F, typename Fd = typename std::remove_reference<F>::type>
     Function& operator= (F *f)
     {
-#if NO_DYNAMIC_ALLOCS
-        static_assert(sizeof(Functor<Fd>) <= sizeof(_functor_sp),
-            "Memory space mismatch");
-        if (_functor) _functor->~FunctorBase();
-        _functor = new (_functor_sp) Functor<Fd>(*f);
-#else
-        delete _functor;
-        _functor = new Functor<Fd>(*f);
-#endif
-        return *this;
+        return init<Functor<Fd>>(f);
     }
 
     // regular function
@@ -287,65 +291,33 @@ public:
     Function(FRes(*f)(FArgs... args))
     {
         // TODO: check if passed types are convertible
-        static_assert(sizeof...(FArgs) == sizeof...(Args),
-            "Calling arguments don't match");
+        static_assert(
+            sizeof...(FArgs) == sizeof...(Args), "Calling arguments don't match");
 
-#if NO_DYNAMIC_ALLOCS
-        static_assert(sizeof(Functor<decltype(f)>) <= sizeof(_functor_sp),
-            "Memory space mismatch");
-        _functor = new (_functor_sp) Functor<decltype(f)>(f);
-#else
-        _functor = new Functor<decltype(f)>(f);
-#endif
+        init<Functor<decltype(f)>>(f);
     }
 
     template<typename FRes, typename ...FArgs>
     Function& operator= (FRes(*f)(FArgs... args))
     {
         // TODO: check if passed types are convertible
-        static_assert(sizeof...(FArgs) == sizeof...(Args),
-            "Calling arguments don't match");
+        static_assert(
+            sizeof...(FArgs) == sizeof...(Args), "Calling arguments don't match");
 
-#if NO_DYNAMIC_ALLOCS
-        static_assert(sizeof(Functor<decltype(f)>) <= sizeof(_functor_sp),
-            "Memory space mismatch");
-        if (_functor) _functor->~FunctorBase();
-        _functor = new (_functor_sp) Functor<decltype(f)>(f);
-#else
-        delete _functor;
-        _functor = new Functor<decltype(f)>(f);
-#endif
-        return *this;
+        return init<Functor<decltype(f)>>(f);
     }
 
     // member function call
     template<typename T, typename F, typename B>
     Function(const _MembPtr<T, F, B>&& mp)
     {
-#if NO_DYNAMIC_ALLOCS
-        static_assert(sizeof(Functor<_MembPtr<T, F, B>>) <= sizeof(_functor_sp),
-            "Memory space mismatch");
-        _functor = new (_functor_sp)
-            Functor<_MembPtr<T, F, B>>(std::forward<decltype(mp)>(mp));
-#else
-        _functor = new Functor<_MembPtr<T, F, B>>(std::forward<decltype(mp)>(mp));
-#endif
+        init<Functor<_MembPtr<T, F, B>>>(std::forward<decltype(mp)>(mp));
     }
 
     template<typename T, typename F, typename B>
     Function& operator= (const _MembPtr<T, F, B>&& mp)
     {
-#if NO_DYNAMIC_ALLOCS
-        static_assert(sizeof(Functor<_MembPtr<T, F, B>>) <= sizeof(_functor_sp),
-            "Memory space mismatch");
-        if (_functor) _functor->~FunctorBase();
-        _functor = new (_functor_sp)
-            Functor<_MembPtr<T, F, B>>(std::forward<decltype(mp)>(mp));
-#else
-        delete _functor;
-        _functor = new Functor<_MembPtr<T, F, B>>(std::forward<decltype(mp)>(mp));
-#endif
-        return *this;
+        return init<Functor<_MembPtr<T, F, B>>>(std::forward<decltype(mp)>(mp));
     }
 
     // call with args
