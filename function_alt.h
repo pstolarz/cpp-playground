@@ -1,6 +1,7 @@
 #ifndef __FUNCTION_ALT_H__
 #define __FUNCTION_ALT_H__
 
+#include <cassert>
 #include <cstring>
 #include <functional>   // std::bad_function_call exception
 #include <type_traits>
@@ -37,29 +38,35 @@ struct _MembPtr
     _MembPtr(const _MembPtr&) = delete;
     _MembPtr& operator= (const _MembPtr&) = delete;
 
-    _MembPtr(T *t, F B::*f): t(t), f(f) {}
+    _MembPtr(T *t, F B::*f) noexcept:
+        t(t), f(f)
+    {}
 
-    _MembPtr(T& t, F B::*f): t(&t), f(f) {}
+    _MembPtr(T& t, F B::*f) noexcept:
+        t(&t), f(f)
+    {}
 
 #if NO_DYNAMIC_ALLOCS
     _MembPtr(_MembPtr&& mp) = default;
     _MembPtr& operator= (_MembPtr&& mp) = default;
+    ~_MembPtr() = default;
 #else
     bool alloced = false;
 
-    _MembPtr(T&& t, F B::*f): f(f)
+    _MembPtr(T&& t, F B::*f):
+        f(f)
     {
         // move rvalue to a new object
         this->t = new T(std::move(t));
         alloced = true;
     }
 
-    _MembPtr(_MembPtr&& mp)
+    _MembPtr(_MembPtr&& mp) noexcept
     {
         operator= (std::forward<decltype(mp)>(mp));
     }
 
-    _MembPtr& operator= (_MembPtr&& mp)
+    _MembPtr& operator= (_MembPtr&& mp) noexcept
     {
         t = mp.t;
         f = mp.f;
@@ -104,12 +111,21 @@ private:
     {
         F *f = nullptr;
 
-        Functor(F *f): f(f) {};
+        Functor(F *f) noexcept:
+            f(f)
+        {};
 
-        Functor(F& f): f(&f) {};
+        Functor(F& f) noexcept:
+            f(&f)
+        {};
 
 #if NO_DYNAMIC_ALLOCS
-        Functor(F&& f): f(&f) {}
+        Functor(F&& f)
+        {
+            // rvalues not allowed with NO_DYNAMIC_ALLOCS configuration
+            assert(false);
+        }
+        ~Functor() = default;
 #else
         bool alloced = false;
 
@@ -144,7 +160,9 @@ private:
         using F = FRes(*)(FArgs...);
         F f;
 
-        Functor(F f): f(f) {};
+        Functor(F f) noexcept:
+            f(f)
+        {};
 
         Res operator() (Args... args) const
             // exception spec. taken from passed functor
@@ -161,7 +179,7 @@ private:
     {
         _MembPtr<T, F, B> mp;
 
-        Functor(_MembPtr<T, F, B>&& mp):
+        Functor(_MembPtr<T, F, B>&& mp) noexcept:
             mp(std::move(mp))
         {};
 
@@ -176,6 +194,9 @@ private:
     // helper routines for object initialization (via constructor or operator=)
     template<typename _Functor, typename F>
     Function& init(F&& f)
+#if NO_DYNAMIC_ALLOCS
+        noexcept
+#endif
     {
 #if NO_DYNAMIC_ALLOCS
         static_assert(
@@ -192,6 +213,9 @@ private:
 
     template<typename _Functor, typename F>
     Function& init(F *f)
+#if NO_DYNAMIC_ALLOCS
+        noexcept
+#endif
     {
 #if NO_DYNAMIC_ALLOCS
         static_assert(
@@ -238,12 +262,12 @@ public:
     Function(const Function&) = delete;
     Function& operator= (const Function&) = delete;
 
-    Function(Function&& f)
+    Function(Function&& f) noexcept
     {
         operator= (std::forward<decltype(f)>(f));
     }
 
-    Function& operator= (Function&& f)
+    Function& operator= (Function&& f) noexcept
     {
         _functor = f._functor;
         f._functor = nullptr;
@@ -263,24 +287,36 @@ public:
     // class with operator()
     template<typename F, typename Fd = typename std::remove_reference<F>::type>
     Function(F&& f)
+#if NO_DYNAMIC_ALLOCS
+        noexcept
+#endif
     {
         init<Functor<Fd>>(std::forward<decltype(f)>(f));
     }
 
     template<typename F, typename Fd = typename std::remove_reference<F>::type>
     Function(F *f)
+#if NO_DYNAMIC_ALLOCS
+        noexcept
+#endif
     {
         init<Functor<Fd>>(f);
     }
 
     template<typename F, typename Fd = typename std::remove_reference<F>::type>
     Function& operator= (F&& f)
+#if NO_DYNAMIC_ALLOCS
+        noexcept
+#endif
     {
         return init<Functor<Fd>>(std::forward<decltype(f)>(f));
     }
 
     template<typename F, typename Fd = typename std::remove_reference<F>::type>
     Function& operator= (F *f)
+#if NO_DYNAMIC_ALLOCS
+        noexcept
+#endif
     {
         return init<Functor<Fd>>(f);
     }
@@ -289,6 +325,9 @@ public:
     // passed types may differ than the declared types if they are convertible
     template<typename FRes, typename ...FArgs>
     Function(FRes(*f)(FArgs... args))
+#if NO_DYNAMIC_ALLOCS
+        noexcept
+#endif
     {
         // TODO: check if passed types are convertible
         static_assert(
@@ -299,6 +338,9 @@ public:
 
     template<typename FRes, typename ...FArgs>
     Function& operator= (FRes(*f)(FArgs... args))
+#if NO_DYNAMIC_ALLOCS
+        noexcept
+#endif
     {
         // TODO: check if passed types are convertible
         static_assert(
@@ -310,18 +352,24 @@ public:
     // member function call
     template<typename T, typename F, typename B>
     Function(const _MembPtr<T, F, B>&& mp)
+#if NO_DYNAMIC_ALLOCS
+        noexcept
+#endif
     {
         init<Functor<_MembPtr<T, F, B>>>(std::forward<decltype(mp)>(mp));
     }
 
     template<typename T, typename F, typename B>
     Function& operator= (const _MembPtr<T, F, B>&& mp)
+#if NO_DYNAMIC_ALLOCS
+        noexcept
+#endif
     {
         return init<Functor<_MembPtr<T, F, B>>>(std::forward<decltype(mp)>(mp));
     }
 
     // call with args
-    Res operator() (Args... args) const noexcept(false)
+    Res operator() (Args... args) const
     {
         if (!_functor) throw std::bad_function_call();
         return _functor->operator()(args...);
@@ -329,14 +377,14 @@ public:
 };
 
 template<typename T, typename F, typename B>
-_MembPtr<T, F, B> memb_ptr(T *t, F B::*f)
+_MembPtr<T, F, B> memb_ptr(T *t, F B::*f) noexcept
 {
     return _MembPtr<T, F, B>(t, f);
 }
 
 template<typename T, typename F, typename B,
     typename Td = typename std::remove_reference<T>::type>
-_MembPtr<Td, F, B> memb_ptr(T& t, F B::*f)
+_MembPtr<Td, F, B> memb_ptr(T& t, F B::*f) noexcept
 {
     return _MembPtr<Td, F, B>(t, f);
 }
@@ -345,7 +393,12 @@ template<typename T, typename F, typename B,
     typename Td = typename std::remove_reference<T>::type>
 _MembPtr<Td, F, B> memb_ptr(T&& t, F B::*f)
 {
+#if NO_DYNAMIC_ALLOCS
+    // rvalues not allowed with NO_DYNAMIC_ALLOCS configuration
+    assert(false);
+#else
     return _MembPtr<Td, F, B>(std::forward<decltype(t)>(t), f);
+#endif
 }
 
 
@@ -364,7 +417,7 @@ static int f(long i, int& j) noexcept(false)
 
 struct S1
 {
-    int operator() (short i, int& j)
+    int operator() (short i, int& j) noexcept
     {
         std::cout << "S1::operator()(short, int&) -> ";
         std::cout << "++i: " << ++i << ", ";
@@ -379,7 +432,7 @@ struct S2
     // ERROR: move constr. is required if passing by rvalue
     // S2(S2&&) = delete;
 
-    int f(char i, int& j)
+    int f(char i, int& j) noexcept
     {
         std::cout << "S2::f(char, int&) -> ";
         std::cout << "++i: " << (int)++i << ", ";
@@ -479,11 +532,22 @@ void test(void)
     func_mov(i, j);
     print_res(sum, i, j);
 
+#if NO_DYNAMIC_ALLOCS
+    auto lambda2 =
+        [](void *arg) -> int {
+            std::cout << static_cast<const char*>(arg) << "\n";
+            return strlen(static_cast<const char*>(arg));
+        };
+#endif
     int res = test_callback(
+#if NO_DYNAMIC_ALLOCS
+        lambda2,
+#else
         [](void *arg) -> int {
             std::cout << static_cast<const char*>(arg) << "\n";
             return strlen(static_cast<const char*>(arg));
         },
+#endif
         const_cast<char*>("Hello world!")
     );
     std::cout << "callback returned " << res << "\n";
