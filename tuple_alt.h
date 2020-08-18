@@ -150,7 +150,9 @@ private:
 
     // final recursion (constexpr function returns 0 to make C++11 compiler happy)
     template<std::size_t I>
-    static constexpr std::size_t _print(std::ostream& os, const TupleEnd*) {
+    static constexpr std::size_t _print(std::ostream& os, const TupleEnd*)
+        noexcept
+    {
         return 0;
     }
 
@@ -226,24 +228,25 @@ struct tuple_element<
  */
 namespace tuple_alt {
 
-static void f() {}
+// may throw
+static void f() noexcept(false) {}
 
 struct A
 {
     int a = 0;
-    int get() { return a; }
+    int get() noexcept { return a; }
 
     A() = default;
-    A(int a): a(a) {}
+    A(int a) noexcept: a(a) {}
 
     // required since A xvalue is stored by copy
     A(const A&) = default;
-    A(A&&) { a = -1; }
+    A(A&&) noexcept { a = -1; }
 };
 
-A f_a() { return A(2); }
-A& f_a(A& a) { return a; }
-A&& f_a(A&& a) { return std::forward<decltype(a)>(a); }
+A f_a() noexcept { return A(2); }
+A& f_a(A& a) noexcept { return a; }
+A&& f_a(A&& a) noexcept { return std::forward<decltype(a)>(a); }
 
 std::ostream& operator<<(std::ostream& os, const A& a)
 {
@@ -337,7 +340,7 @@ void test()
     std::cout << "#13: " << e13 << ", type check: " <<
         std::is_same<decltype(e13), int A::* const>::value << "\n";
     std::cout << "#14: " << e14 << ", type check: " <<
-        std::is_same<decltype(e14), int (A::* const)()>::value << "\n";
+        std::is_same<decltype(e14), int (A::* const)() noexcept>::value << "\n";
     std::cout << "#15: " << e15 << ", type check: " <<
         std::is_same<decltype(e15), int A::*&>::value << "\n";
     std::cout << "#16: " << e16 << ", type check: " <<
