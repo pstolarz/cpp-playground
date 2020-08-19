@@ -1,8 +1,7 @@
 #ifndef __FUNCTION_ALT_H__
 #define __FUNCTION_ALT_H__
 
-#include <cassert>
-#include <cstring>
+#include <cstring>      // strlen() (used by test only)
 #include <functional>   // std::bad_function_call exception
 #include <type_traits>
 
@@ -122,8 +121,8 @@ private:
 #if NO_DYNAMIC_ALLOCS
         Functor(F&& f)
         {
-            // rvalues not allowed with NO_DYNAMIC_ALLOCS configuration
-            assert(false);
+            static_assert(!std::is_rvalue_reference<F&&>::value,
+                "rvalues not allowed with NO_DYNAMIC_ALLOCS configuration");
         }
         ~Functor() = default;
 #else
@@ -394,8 +393,8 @@ template<typename T, typename F, typename B,
 _MembPtr<Td, F, B> memb_ptr(T&& t, F B::*f)
 {
 #if NO_DYNAMIC_ALLOCS
-    // rvalues not allowed with NO_DYNAMIC_ALLOCS configuration
-    assert(false);
+    static_assert(!std::is_rvalue_reference<T&&>::value,
+        "rvalues not allowed with NO_DYNAMIC_ALLOCS configuration");
 #else
     return _MembPtr<Td, F, B>(std::forward<decltype(t)>(t), f);
 #endif
@@ -532,22 +531,14 @@ void test(void)
     func_mov(i, j);
     print_res(sum, i, j);
 
-#if NO_DYNAMIC_ALLOCS
     auto lambda2 =
         [](void *arg) -> int {
             std::cout << static_cast<const char*>(arg) << "\n";
             return strlen(static_cast<const char*>(arg));
         };
-#endif
     int res = test_callback(
-#if NO_DYNAMIC_ALLOCS
+        // may be passed directly by rvalue if NO_DYNAMIC_ALLOCS is not configured
         lambda2,
-#else
-        [](void *arg) -> int {
-            std::cout << static_cast<const char*>(arg) << "\n";
-            return strlen(static_cast<const char*>(arg));
-        },
-#endif
         const_cast<char*>("Hello world!")
     );
     std::cout << "callback returned " << res << "\n";
