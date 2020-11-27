@@ -21,12 +21,12 @@ struct chk_spec<T, void_alias<T_EXPR(T)>> {
     static constexpr bool value = true;
 };
 
-/* ERROR : conflinting with previoud spec.: chk_spec<T, void>
-template <typename T>
-struct chk_spec<T, void_alias<void>> {
-    static constexpr int value = true;
-};
-*/
+/* ERROR: conflinting with chk_spec<T, void_alias<T_EXPR(T)>> spec.
+   in case T_EXPR(T) is a valid expression, otherwise would be OK */
+//template <typename T>
+//struct chk_spec<T, void> {
+//    static constexpr int value = true;
+//};
 
 template<bool V>
 struct chk_result {
