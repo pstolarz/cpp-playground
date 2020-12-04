@@ -1,6 +1,8 @@
 #ifndef __REFS_H__
 #define __REFS_H__
 
+#include <type_traits>
+
 namespace refs {
 
 template<typename T>
@@ -54,13 +56,24 @@ void test()
     A a;
 
     // ERROR: can't initialize rvalue with lvalue
-    // A&& k = a;
+    // A&& ra1 = a;
 
-    A&& k = std::move(a);   // OK: moved
-    k = a;                  // OK: k treated as lvalue
+    A&& ra2 = std::move(a);   // OK: moved
+    ra2 = a;                  // OK: ra2 treated as lvalue
 
-    A&& l = A{};    // xvalue
-    (void)l;        // get rid of compiler warning
+    A&& ra3 = A{};    // xvalue
+    (void)ra3;        // get rid of compiler warning
+
+    /*
+     * universal reference
+     */
+    // OK: auto&& colapses to int& since i is treated as lvalue
+    auto&& ri1 = i;
+    static_assert(std::is_same<decltype(ri1), int&>::value);
+
+    // OK: int&& rvalue
+    auto&& ri2 = 0;
+    static_assert(std::is_same<decltype(ri2), int&&>::value);
 }
 
 } // namespace refs
