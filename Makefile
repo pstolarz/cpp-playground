@@ -11,7 +11,8 @@ HEADERS = \
     check_type_expr.h \
     meta_list.h \
     function_alt.h \
-    tuple_alt.h
+    tuple_alt.h \
+    bind_alt_c17.h
 
 all: main
 

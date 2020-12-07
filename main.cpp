@@ -52,6 +52,7 @@ namespace std {
 #include "meta_list.h"
 #include "function_alt.h"
 #include "tuple_alt.h"
+#include "bind_alt_c17.h"
 
 int main(void)
 {
@@ -78,6 +79,9 @@ int main(void)
 
     std::cout << "\n--------- tuple_alt"  << "\n";
     tuple_alt::test();
+
+    std::cout << "\n--------- bind_alt (C++17)"  << "\n";
+    bind_alt_c17::test();
 
     return 0;
 }
