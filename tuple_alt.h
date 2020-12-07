@@ -187,8 +187,8 @@ detail::_Tuple<detail::_TypesList<Types...>> make_tuple(Types&&... args)
 
 namespace std {
 
-#if __cplusplus == 201103L
-// C++11 doesn't have overloaded operator<< for printing nullptr_t
+#if __cplusplus <= 201402L
+// C++14 doesn't have overloaded operator<< for printing nullptr_t
 ostream& operator<<(ostream &os, nullptr_t) {
     return os << "nullptr";
 }

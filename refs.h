@@ -69,11 +69,13 @@ void test()
      */
     // OK: auto&& colapses to int& since i is treated as lvalue
     auto&& ri1 = i;
-    static_assert(std::is_same<decltype(ri1), int&>::value);
+    static_assert(
+        std::is_same<decltype(ri1), int&>::value, "decltype(ri1) != int&");
 
     // OK: int&& rvalue
     auto&& ri2 = 0;
-    static_assert(std::is_same<decltype(ri2), int&&>::value);
+    static_assert(
+        std::is_same<decltype(ri2), int&&>::value, "decltype(ri2) != int&&");
 }
 
 } // namespace refs
