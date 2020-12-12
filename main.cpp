@@ -17,30 +17,30 @@ void _print_array(std::ostream& os, T (*arr)[N])
 
 namespace std {
 
-    // custom printing routine for pointer to object/function member
-    template<typename F, typename B>
-    ostream& operator<<(ostream& os, F B::*mp)
-    {
-        os << (is_member_object_pointer<decltype(mp)>::value ?
-            "memb_obj_ptr [" : "memb_func_ptr [");
+// custom printing routine for pointer to object/function member
+template<typename F, typename B>
+ostream& operator<<(ostream& os, F B::*mp)
+{
+    os << (is_member_object_pointer<decltype(mp)>::value ?
+        "memb_obj_ptr [" : "memb_func_ptr [");
 
 #if __cplusplus >= 201703L
-        if constexpr
+    if constexpr
 #else
-        if
+    if
 #endif
-           (!(sizeof(F B::*) % sizeof(void*)))
-        {
-            // array of pointers
-            _print_array<void*>(os,
-                reinterpret_cast<void* (*)[sizeof(mp) / sizeof(void*)]>(&mp));
-        } else {
-            // unknown format
-            _print_array<int>(os,
-                reinterpret_cast<uint8_t (*)[sizeof(mp)]>(&mp));
-        }
-        return os << "]";
+       (!(sizeof(F B::*) % sizeof(void*)))
+    {
+        // array of pointers
+        _print_array<void*>(os,
+            reinterpret_cast<void* (*)[sizeof(mp) / sizeof(void*)]>(&mp));
+    } else {
+        // unknown format
+        _print_array<int>(os,
+            reinterpret_cast<uint8_t (*)[sizeof(mp)]>(&mp));
     }
+    return os << "]";
+}
 
 } // std namespace
 

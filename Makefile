@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-CC=gcc-10
+CXX=gcc-10
 CXXFLAGS+=-Wall --std=c++2a
 
 HEADERS = \
@@ -20,4 +20,4 @@ clean:
 	rm -f main
 
 main: main.cpp $(HEADERS)
-	$(CC) $(CXXFLAGS) $< -o $@ -lstdc++
+	$(CXX) $(CXXFLAGS) $< -o $@ -lstdc++
