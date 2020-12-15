@@ -3,6 +3,7 @@
 #include <iostream>
 #include <optional>
 #include <set>
+#include <stdexcept>
 
 namespace std {
 
@@ -102,17 +103,31 @@ private:
     int _yield;
 };
 
+enum class RaiseExcept: int
+{
+    EXCEPT_NO = 0,
+    EXCEPT_INIT,        // exception raised in initial_suspend()
+    EXCEPT_FINAL        // exception raised in final_suspend()
+};
+
 template<typename InitialSuspend, typename FinalSuspend>
 struct Result
 {
     struct Promise
     {
-        Promise() noexcept:
-            _ready(false), _suspend(true), _results()
-        {}
+        // supported since gcc-11
+        // using enum RaiseExcept;
 
-        Promise(bool ready, bool suspend) noexcept:
-            _ready(ready), _suspend(suspend), _results()
+        Promise() noexcept:
+            _ready(false), _suspend(true),
+            _rexcept(RaiseExcept::EXCEPT_NO), _results()
+        {
+            std::cout << "Promise::Promise(); " << (void*)this << "\n";
+        }
+
+        Promise(bool ready, bool suspend,
+            RaiseExcept rexcept = RaiseExcept::EXCEPT_NO) noexcept:
+            _ready(ready), _suspend(suspend), _rexcept(rexcept), _results()
         {
             std::cout << "Promise::Promise(); " << (void*)this << "\n";
         }
@@ -143,13 +158,23 @@ struct Result
             return this;
         }
 
-        InitialSuspend initial_suspend() const noexcept {
+        InitialSuspend initial_suspend() const
+        {
             std::cout << "Promise::initial_suspend()\n";
+
+            if (_rexcept == RaiseExcept::EXCEPT_INIT)
+                throw std::runtime_error("init_suspend() exception");
+
             return {};
         }
 
-        FinalSuspend final_suspend() const noexcept {
+        FinalSuspend final_suspend() const
+        {
             std::cout << "Promise::final_suspend()\n";
+
+            if (_rexcept == RaiseExcept::EXCEPT_FINAL)
+                throw std::runtime_error("init_final() exception");
+
             return {};
         }
 
@@ -164,16 +189,17 @@ struct Result
             for (auto r: _results) { r->_ret_code = ret_code; }
         }
 
-        void unhandled_exception() noexcept {
+        void unhandled_exception() {
             std::cout << "Promise::unhandled_exception()\n";
 
-            // inform associated objects about the raised exception
-            for (auto r: _results) { r->_except = std::current_exception(); }
+            // re-throw the exception
+            std::rethrow_exception(std::current_exception());
         }
 
     private:
         bool _ready;
         bool _suspend;
+        RaiseExcept _rexcept;
         std::set<Result*> _results;
 
         friend struct Result;
@@ -183,7 +209,7 @@ struct Result
     using Handle = std::coroutine_handle<Promise>;
 
     Result(Promise *promise) noexcept:
-        _promise(promise), _ret_code(), _except(nullptr), _yield_code(0)
+        _promise(promise), _ret_code(), _yield_code(0)
     {
         std::cout << "Result::Result(); " << (void*)this << "\n";
 
@@ -194,8 +220,14 @@ struct Result
     ~Result() {
         std::cout << "Result::~Result(); " << (void*)this << "\n";
 
-        // unbind the object from its promise
-        if (_promise) _promise->_results.erase(this);
+        if (_promise) {
+            // unbind the object from its promise
+            _promise->_results.erase(this);
+
+            // destroy promise if no more results are associated with it
+            if (_promise->_results.size() <= 0)
+                Handle::from_promise(*_promise).destroy();
+        }
     }
 
     auto ret_code() {
@@ -204,10 +236,6 @@ struct Result
 
     auto yield_code() {
         return _yield_code;
-    }
-
-    auto exception() {
-        return _except;
     }
 
     bool done() {
@@ -229,7 +257,6 @@ private:
     Promise *_promise;
 
     std::optional<int> _ret_code;
-    std::exception_ptr _except;
     int _yield_code;
 
 };
@@ -245,27 +272,32 @@ using ResultAN = Result<std::suspend_always, std::suspend_never>;
 using ResultNN = Result<std::suspend_never, std::suspend_never>;
 using ResultNA = Result<std::suspend_never, std::suspend_always>;
 
-ResultAA co_return_1(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND) {
+ResultAA co_return_1(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND)
+{
     co_return 1;
 }
 
-ResultNN co_return_2(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND) {
+ResultNN co_return_2(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND)
+{
     co_return 2;
 }
 
-ResultNA co_await_1(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND) {
+ResultNA co_await_1(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND)
+{
     int ares = co_await 1;
     std::cout << "co_await -> " << ares << "\n";
     // co_return;
 }
 
-ResultAN co_await_2(bool = AWAIT_READY, bool = AWAIT_SUSPEND) {
+ResultAN co_await_2(bool = AWAIT_READY, bool = AWAIT_SUSPEND)
+{
     int ares = co_await 2;
     std::cout << "co_await -> " << ares << "\n";
     co_return ares;
 }
 
-ResultNN co_await_3(bool = AWAIT_NOT_READY, bool = AWAIT_NOT_SUSPEND) {
+ResultNN co_await_3(bool = AWAIT_NOT_READY, bool = AWAIT_NOT_SUSPEND)
+{
     int ares = co_await 3;
     std::cout << "co_await -> " << ares << "\n";
     co_return ares;
@@ -276,11 +308,30 @@ ResultNA co_yield_1()
     int i=0, yres;
 
     do {
-        yres = co_yield i++;
+        yres = co_yield ++i;
         std::cout << "co_yield -> " << yres << "\n";
     } while (yres < 5);
 
     co_return 1;
+}
+
+ResultNN co_except_1(bool = AWAIT_READY, bool = AWAIT_NOT_SUSPEND,
+    RaiseExcept = RaiseExcept::EXCEPT_NO)
+{
+    throw std::runtime_error("coroutine exception");
+    co_return 1;
+}
+
+ResultNN co_except_2(bool = AWAIT_READY, bool = AWAIT_NOT_SUSPEND,
+    RaiseExcept = RaiseExcept::EXCEPT_INIT)
+{
+    co_return 2;
+}
+
+ResultNN co_except_3(bool = AWAIT_READY, bool = AWAIT_NOT_SUSPEND,
+    RaiseExcept = RaiseExcept::EXCEPT_FINAL)
+{
+    co_return 3;
 }
 
 int main(void)
@@ -294,13 +345,13 @@ int main(void)
         r.resume();
         std::cout << "  [final suspended] done:" <<
             r.done() << ", ret_code:" << r.ret_code() << "\n";
-        r.destroy();
+        std::cout << "  [coroutine destroyed via RAII]\n";
     }
 
     {
         std::cout << "\n--- co_return [init_suspend:N, final_suspend:N]\n";
         auto r = co_return_2();
-        std::cout << "  [coroutine destroyed] done:" <<
+        std::cout << "  [coroutine destroyed automatically] done:" <<
             r.done() << ", ret_code: " << r.ret_code() << "\n";
     }
 
@@ -314,7 +365,7 @@ int main(void)
         r.resume();
         std::cout << "  [final suspended] done:" <<
             r.done() << ", ret_code:" << r.ret_code() << "\n";
-        r.destroy();
+        std::cout << "  [coroutine destroyed via RAII]\n";
     }
 
     {
@@ -324,16 +375,15 @@ int main(void)
         std::cout << "  [init suspended] done:" <<
             r.done() << ", ret_code:" << r.ret_code() << "\n";
         r.resume();
-        std::cout << "  [coroutine destroyed] done:" <<
+        std::cout << "  [coroutine destroyed automatically] done:" <<
             r.done() << ", ret_code:" << r.ret_code() << "\n";
-        r.destroy();
     }
 
     {
         std::cout << "\n--- co_await "
             "[init suspend:N, final_suspend:N, await_ready:N, await_suspend:N]\n";
         auto r = co_await_3();
-        std::cout << "  [coroutine destroyed] done:" <<
+        std::cout << "  [coroutine destroyed automatically] done:" <<
             r.done() << ", ret_code:" << r.ret_code() << "\n";
     }
 
@@ -348,7 +398,40 @@ int main(void)
         }
         std::cout << "  [final suspended] done:" <<
             r.done() << ", ret_code:" << r.ret_code() << "\n";
-        r.destroy();
+    }
+
+    // exception tests
+    //
+    // BUG in gcc-10: while raising exception on any stage of coroutine life
+    // (e.g. initial/final suspend, coroutine body) the coroutine frame is not
+    // freed and the stack with coroutine result object is not unwinded:
+    //
+    // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=95615
+    {
+        std::cout << "\n--- exception in coroutine body\n";
+        try {
+            auto r = co_except_1();
+        } catch(const std::exception& e) {
+            std::cout << "Exception: " << e.what() << "\n";
+        }
+    }
+
+    {
+        std::cout << "\n--- exception in initial_suspend()\n";
+        try {
+            auto r = co_except_2();
+        } catch(const std::exception& e) {
+            std::cout << "Exception: " << e.what() << "\n";
+        }
+    }
+
+    {
+        std::cout << "\n--- exception in final_suspend()\n";
+        try {
+            auto r = co_except_3();
+        } catch(const std::exception& e) {
+            std::cout << "Exception: " << e.what() << "\n";
+        }
     }
 
     return 0;
