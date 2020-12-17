@@ -3,9 +3,10 @@
 
 namespace bind_alt_c17 {
 
-#include <cassert>
-
 #if __cplusplus >= 201703L
+
+#include <cassert>
+#include <functional>
 
 struct A { int a; };
 
@@ -16,17 +17,35 @@ int f(int i, A a1, A& a2) {
 
 void test()
 {
-    auto bind_f = [] (auto i) {
-        return [i] (auto&& a1, auto&& a2) -> auto {
+    // similar to std::bind(f, 0, _1, _2)
+    // no need to use cumbersome ref-wrappers
+    auto b_f0 = [] (auto&& a1, auto&& a2) -> auto {
+        return f(0, a1, a2);
+    };
+
+    A a1 = { .a = 0 };
+    A a2 = { .a = 1 };
+    b_f0(a1, a2);
+    assert(a1.a == 0 && a2.a == 2);
+
+    // may be used in similar context as bind in std::function
+    std::function<int(A, A&)> func = b_f0;
+    a1.a = 0;
+    a2.a = 1;
+    func(a1, a2);
+    assert(a1.a == 0 && a2.a == 2);
+
+    // similar to previous but with parametrized functor and int argument
+    auto b = [] (auto f, int i) -> auto {
+        return [f, i] (auto&& a1, auto&& a2) -> auto {
             return f(i, a1, a2);
         };
     };
 
-    auto bf_0 = bind_f(0.1);
-
-    A a1 = { .a = 0 };
-    A a2 = { .a = 1 };
-    bf_0(a1, a2);
+    auto b_f1 = b(f, 1);
+    a1.a = 0;
+    a2.a = 1;
+    b_f1(a1, a2);
     assert(a1.a == 0 && a2.a == 2);
 }
 
