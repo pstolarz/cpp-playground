@@ -1,12 +1,16 @@
 .PHONY: all clean
 
 CXX=gcc-10
-CXXFLAGS+=-Wall -fcoroutines --std=c++2a
+CXXFLAGS+=-Wall -g -fcoroutines --std=c++2a
 
-all: main
+OBJS = \
+       main \
+       symmetric
 
-main: main.cpp
+all: $(OBJS)
+
+%: %.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@ -lstdc++
 
 clean:
-	$(RM) *.o main
+	$(RM) *.o $(OBJS)

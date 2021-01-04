@@ -135,7 +135,14 @@ struct Result
         ~Promise() noexcept {
             std::cout << "Promise::~Promise(); " << (void*)this << "\n";
 
-            // inform associated objects about their promise removal
+            /*
+             * Inform associated objects about their promise removal.
+             * This step is required since the promise may be destroyed
+             * before result objects associated with it - this may occur
+             * if a coroutine is not suspended on its final stage and is
+             * terminated automatically (not by its lastly destroyed result
+             * object).
+             */
             for (auto r: _results) { r->_promise = nullptr; }
             _results.clear();
         }
@@ -163,7 +170,7 @@ struct Result
             std::cout << "Promise::initial_suspend()\n";
 
             if (_rexcept == RaiseExcept::EXCEPT_INIT)
-                throw std::runtime_error("init_suspend() exception");
+                throw std::runtime_error("initial_suspend() exception");
 
             return {};
         }
@@ -173,7 +180,7 @@ struct Result
             std::cout << "Promise::final_suspend()\n";
 
             if (_rexcept == RaiseExcept::EXCEPT_FINAL)
-                throw std::runtime_error("init_final() exception");
+                throw std::runtime_error("final_suspend() exception");
 
             return {};
         }
@@ -208,13 +215,17 @@ struct Result
     using promise_type = Promise;
     using Handle = std::coroutine_handle<Promise>;
 
+    Result() = delete;
+
     Result(Promise *promise) noexcept:
         _promise(promise), _ret_code(), _yield_code(0)
     {
         std::cout << "Result::Result(); " << (void*)this << "\n";
 
-         // bind the object with its promise
-        _promise->_results.insert(this);
+        if (_promise) {
+            // bind the object with its promise
+            _promise->_results.insert(this);
+        }
     }
 
     ~Result() {
@@ -229,6 +240,16 @@ struct Result
                 Handle::from_promise(*_promise).destroy();
         }
     }
+
+    Result(const Result& r) noexcept: Result(r._promise) {
+        _ret_code = r._ret_code;
+        _yield_code = r._yield_code;
+    }
+
+    Result(Result&& r) noexcept: Result(r) {}
+
+    Result& operator=(const Result&) = delete;
+    Result& operator=(const Result&&) = delete;
 
     auto ret_code() {
         return _ret_code;
@@ -247,13 +268,8 @@ struct Result
             Handle::from_promise(*_promise).resume();
     }
 
-    void destroy() {
-        if (_promise)
-            Handle::from_promise(*_promise).destroy();
-    }
-
 private:
-    // if null promise has been freed
+    // if null promise has been destroyed
     Promise *_promise;
 
     std::optional<int> _ret_code;
@@ -338,18 +354,18 @@ int main(void)
 {
     // co_return tests
     {
-        std::cout << "--- co_return [init_suspend:Y, final_suspend:Y]\n";
+        std::cout << "--- co_return [initial_suspend:Y, final_suspend:Y]\n";
         auto r = co_return_1();
-        std::cout << "  [init suspended] done:" <<
+        std::cout << "  [initially suspended] done:" <<
             r.done() << ", ret_code:" << r.ret_code() << "\n";
         r.resume();
-        std::cout << "  [final suspended] done:" <<
+        std::cout << "  [finally suspended] done:" <<
             r.done() << ", ret_code:" << r.ret_code() << "\n";
         std::cout << "  [coroutine destroyed via RAII]\n";
     }
 
     {
-        std::cout << "\n--- co_return [init_suspend:N, final_suspend:N]\n";
+        std::cout << "\n--- co_return [initial_suspend:N, final_suspend:N]\n";
         auto r = co_return_2();
         std::cout << "  [coroutine destroyed automatically] done:" <<
             r.done() << ", ret_code: " << r.ret_code() << "\n";
@@ -358,21 +374,21 @@ int main(void)
     // co_await tests
     {
         std::cout << "\n--- co_await "
-            "[init suspend:N, final_suspend:Y, await_ready:N, await_suspend:Y]\n";
+            "[initial_suspend:N, final_suspend:Y, await_ready:N, await_suspend:Y]\n";
         auto r = co_await_1();
         std::cout << "  [co_await suspended] done:" <<
             r.done() << ", ret_code:" << r.ret_code() << "\n";
         r.resume();
-        std::cout << "  [final suspended] done:" <<
+        std::cout << "  [finally suspended] done:" <<
             r.done() << ", ret_code:" << r.ret_code() << "\n";
         std::cout << "  [coroutine destroyed via RAII]\n";
     }
 
     {
         std::cout << "\n--- co_await "
-            "[init suspend:Y, final_suspend:N, await_ready:Y, await_suspend:Y]\n";
+            "[initial_suspend:Y, final_suspend:N, await_ready:Y, await_suspend:Y]\n";
         auto r = co_await_2();
-        std::cout << "  [init suspended] done:" <<
+        std::cout << "  [initially suspended] done:" <<
             r.done() << ", ret_code:" << r.ret_code() << "\n";
         r.resume();
         std::cout << "  [coroutine destroyed automatically] done:" <<
@@ -381,7 +397,7 @@ int main(void)
 
     {
         std::cout << "\n--- co_await "
-            "[init suspend:N, final_suspend:N, await_ready:N, await_suspend:N]\n";
+            "[initial_suspend:N, final_suspend:N, await_ready:N, await_suspend:N]\n";
         auto r = co_await_3();
         std::cout << "  [coroutine destroyed automatically] done:" <<
             r.done() << ", ret_code:" << r.ret_code() << "\n";
@@ -389,14 +405,14 @@ int main(void)
 
     // co_yield tests
     {
-        std::cout << "\n--- co_yield [init suspend:N, final_suspend:Y]\n";
+        std::cout << "\n--- co_yield [initial_suspend:N, final_suspend:Y]\n";
         auto r = co_yield_1();
         while (!r.done()) {
             std::cout << "  [co_yield suspended] done:" <<
                 r.done() << ", yield_code:" << r.yield_code() << "\n";
             r.resume();
         }
-        std::cout << "  [final suspended] done:" <<
+        std::cout << "  [finally suspended] done:" <<
             r.done() << ", ret_code:" << r.ret_code() << "\n";
     }
 
