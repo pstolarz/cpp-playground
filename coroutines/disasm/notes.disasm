@@ -1,0 +1,236 @@
+coroutine_handle<>::resume() ---------------------------------------------------
+
+000000000000164a <std::__n4861::coroutine_handle<void>::resume() const>:
+std::__n4861::coroutine_handle<void>::resume() const:
+/usr/include/c++/10/coroutine:126
+      void resume() const { __builtin_coro_resume(_M_fr_ptr); }
+    164a:	55                   	push   rbp
+    164b:	48 89 e5             	mov    rbp,rsp
+    164e:	48 83 ec 10          	sub    rsp,0x10
+    1652:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    1656:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    165a:	48 8b 00             	mov    rax,QWORD PTR [rax]
+    165d:	48 8b 10             	mov    rdx,QWORD PTR [rax]
+    1660:	48 89 c7             	mov    rdi,rax
+    1663:	ff d2                	call   rdx                             ; coroutine_handle->_M_fr_ptr->co_await_test()
+    1665:	90                   	nop
+    1666:	c9                   	leave
+    1667:	c3                   	ret
+
+
+coroutine: main::co_await_test() -----------------------------------------------
+
+0000000000001266 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)>:
+_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*):
+    1266:	55                   	push   rbp
+    1267:	48 89 e5             	mov    rbp,rsp
+    126a:	53                   	push   rbx
+    126b:	48 83 ec 28          	sub    rsp,0x28
+    126f:	48 89 7d d8          	mov    QWORD PTR [rbp-0x28],rdi
+    1273:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]        ; coroutine_frame: _M_fr_ptr
+    1277:	0f b7 40 14          	movzx  eax,WORD PTR [rax+0x14]         ; coroutine_state: _M_fr_ptr->state
+    127b:	83 e0 01             	and    eax,0x1
+    127e:	66 85 c0             	test   ax,ax
+    1281:	74 2d                	je     12b0
+    1283:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]        ; coroutine_state is odd
+    1287:	0f b7 40 14          	movzx  eax,WORD PTR [rax+0x14]
+    128b:	0f b7 c0             	movzx  eax,ax
+    128e:	83 f8 07             	cmp    eax,0x7
+    1291:	0f 84 07 02 00 00    	je     149e
+    1297:	83 f8 07             	cmp    eax,0x7                         ; if (coroutine_state > 7) goto ABORT1
+    129a:	7f 12                	jg     12ae
+    129c:	83 f8 03             	cmp    eax,0x3
+    129f:	0f 84 ae 00 00 00    	je     1353
+    12a5:	83 f8 05             	cmp    eax,0x5
+    12a8:	0f 84 2a 01 00 00    	je     13d8
+    12ae:	0f 0b                	ud2                                    ; ABORT1; coroutine_state > 7 or 1
+    12b0:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]        ; coroutine_state is even
+    12b4:	0f b7 40 14          	movzx  eax,WORD PTR [rax+0x14]
+    12b8:	0f b7 c0             	movzx  eax,ax
+    12bb:	83 f8 06             	cmp    eax,0x6
+    12be:	0f 84 dc 01 00 00    	je     14a0
+    12c4:	83 f8 06             	cmp    eax,0x6
+    12c7:	7f 47                	jg     1310
+    12c9:	83 f8 04             	cmp    eax,0x4
+    12cc:	0f 84 0d 01 00 00    	je     13df
+    12d2:	83 f8 04             	cmp    eax,0x4
+    12d5:	7f 39                	jg     1310
+    12d7:	85 c0                	test   eax,eax
+    12d9:	74 07                	je     12e2
+    12db:	83 f8 02             	cmp    eax,0x2
+    12de:	74 78                	je     1358
+    12e0:	eb 2e                	jmp    1310
+
+; co_await Promise::initial_suspend()
+    12e2:	48 8b 5d d8          	mov    rbx,QWORD PTR [rbp-0x28]        ; AWAIT_INIT; coroutine_state == 0
+    12e6:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    12ea:	48 89 c7             	mov    rdi,rax
+    12ed:	e8 1c 06 00 00       	call   190e <std::__n4861::coroutine_handle<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::from_address(void*)>
+    12f2:	48 89 43 18          	mov    QWORD PTR [rbx+0x18],rax
+    12f6:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    12fa:	c6 40 22 00          	mov    BYTE PTR [rax+0x22],0x0
+    12fe:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1302:	48 83 c0 10          	add    rax,0x10
+    1306:	48 89 c7             	mov    rdi,rax
+    1309:	e8 da 04 00 00       	call   17e8 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::initial_suspend() const>
+    130e:	eb 02                	jmp    1312
+    1310:	0f 0b                	ud2                                    ; ABORT2
+    1312:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1316:	48 83 c0 23          	add    rax,0x23
+    131a:	48 89 c7             	mov    rdi,rax
+    131d:	e8 66 03 00 00       	call   1688 <std::__n4861::suspend_always::await_ready()>
+    1322:	83 f0 01             	xor    eax,0x1
+    1325:	84 c0                	test   al,al
+    1327:	74 2f                	je     1358
+    1329:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    132d:	66 c7 40 14 02 00    	mov    WORD PTR [rax+0x14],0x2
+    1333:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1337:	48 8d 50 23          	lea    rdx,[rax+0x23]
+    133b:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    133f:	48 8b 40 18          	mov    rax,QWORD PTR [rax+0x18]
+    1343:	48 89 c6             	mov    rsi,rax
+    1346:	48 89 d7             	mov    rdi,rdx
+    1349:	e8 4a 03 00 00       	call   1698 <std::__n4861::suspend_always::await_suspend(std::__n4861::coroutine_handle<void>)>
+    134e:	e9 8a 01 00 00       	jmp    14dd                            ; goto RETURN
+    1353:	e9 58 01 00 00       	jmp    14b0                            ; AWAIT_INIT_DESTORY; if (coroutine_state == 3) goto DESTROY
+    1358:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]        ; AWAIT_INIT_RESUME; coroutine_state == 2
+    135c:	c6 40 22 01          	mov    BYTE PTR [rax+0x22],0x1
+    1360:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1364:	48 83 c0 23          	add    rax,0x23
+    1368:	48 89 c7             	mov    rdi,rax
+    136b:	e8 38 03 00 00       	call   16a8 <std::__n4861::suspend_always::await_resume()>
+
+; BEGIN coroutine body
+; int ares = co_await 1
+    1370:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1374:	48 8d 48 10          	lea    rcx,[rax+0x10]
+    1378:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    137c:	48 83 c0 28          	add    rax,0x28
+    1380:	ba 01 00 00 00       	mov    edx,0x1
+    1385:	48 89 ce             	mov    rsi,rcx
+    1388:	48 89 c7             	mov    rdi,rax
+    138b:	e8 24 03 00 00       	call   16b4 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::await_transform(int) const>
+    1390:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1394:	48 83 c0 28          	add    rax,0x28
+    1398:	48 89 c7             	mov    rdi,rax
+    139b:	e8 86 03 00 00       	call   1726 <Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::await_ready() const>
+    13a0:	83 f0 01             	xor    eax,0x1
+    13a3:	84 c0                	test   al,al
+    13a5:	74 38                	je     13df
+    13a7:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    13ab:	66 c7 40 14 04 00    	mov    WORD PTR [rax+0x14],0x4
+    13b1:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    13b5:	48 8d 50 28          	lea    rdx,[rax+0x28]
+    13b9:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    13bd:	48 8b 40 18          	mov    rax,QWORD PTR [rax+0x18]
+    13c1:	48 89 c6             	mov    rsi,rax
+    13c4:	48 89 d7             	mov    rdi,rdx
+    13c7:	e8 8c 03 00 00       	call   1758 <Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::await_suspend(std::__n4861::coroutine_handle<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>) const>
+    13cc:	83 f0 01             	xor    eax,0x1
+    13cf:	84 c0                	test   al,al
+    13d1:	75 0c                	jne    13df
+    13d3:	e9 05 01 00 00       	jmp    14dd
+    13d8:	bb 00 00 00 00       	mov    ebx,0x0                         ; BODY_AWAIT_DESTROY; coroutine_state == 5
+    13dd:	eb 1c                	jmp    13fb
+    13df:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]        ; BODY_AWAIT_RESUME; coroutine_state == 4
+    13e3:	48 83 c0 28          	add    rax,0x28
+    13e7:	48 89 c7             	mov    rdi,rax
+    13ea:	e8 a1 03 00 00       	call   1790 <Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::await_resume() const>
+    13ef:	48 8b 55 d8          	mov    rdx,QWORD PTR [rbp-0x28]
+    13f3:	89 42 24             	mov    DWORD PTR [rdx+0x24],eax
+    13f6:	bb 01 00 00 00       	mov    ebx,0x1
+    13fb:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    13ff:	48 83 c0 28          	add    rax,0x28
+    1403:	48 89 c7             	mov    rdi,rax
+    1406:	e8 f3 02 00 00       	call   16fe <Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::~Awaitable()>
+    140b:	83 fb 01             	cmp    ebx,0x1
+    140e:	0f 85 9c 00 00 00    	jne    14b0                            ; if (coroutine_state == 5) goto DESTROY
+    1414:	90                   	nop
+
+; printf("co_await -> %d\n", ares);
+    1415:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1419:	8b 40 24             	mov    eax,DWORD PTR [rax+0x24]
+    141c:	89 c6                	mov    esi,eax
+    141e:	48 8d 3d e7 0b 00 00 	lea    rdi,[rip+0xbe7]        # 200c <AWAIT_NOT_SUSPEND+0x1>
+    1425:	b8 00 00 00 00       	mov    eax,0x0
+    142a:	e8 01 fc ff ff       	call   1030 <printf@plt>
+
+; co_return 1;
+    142f:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1433:	48 83 c0 10          	add    rax,0x10
+    1437:	be 01 00 00 00       	mov    esi,0x1
+    143c:	48 89 c7             	mov    rdi,rax
+    143f:	e8 7c 03 00 00       	call   17c0 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::return_value(int)>
+    1444:	90                   	nop
+; END coroutine body
+
+; co_await Promise::final_suspend()
+    1445:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1449:	48 c7 00 00 00 00 00 	mov    QWORD PTR [rax],0x0
+    1450:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1454:	48 83 c0 10          	add    rax,0x10
+    1458:	48 89 c7             	mov    rdi,rax
+    145b:	e8 c8 03 00 00       	call   1828 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::final_suspend() const>
+    1460:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1464:	48 83 c0 30          	add    rax,0x30
+    1468:	48 89 c7             	mov    rdi,rax
+    146b:	e8 18 02 00 00       	call   1688 <std::__n4861::suspend_always::await_ready()>
+    1470:	83 f0 01             	xor    eax,0x1
+    1473:	84 c0                	test   al,al
+    1475:	74 29                	je     14a0
+    1477:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    147b:	66 c7 40 14 06 00    	mov    WORD PTR [rax+0x14],0x6
+    1481:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1485:	48 8d 50 30          	lea    rdx,[rax+0x30]
+    1489:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    148d:	48 8b 40 18          	mov    rax,QWORD PTR [rax+0x18]
+    1491:	48 89 c6             	mov    rsi,rax
+    1494:	48 89 d7             	mov    rdi,rdx
+    1497:	e8 fc 01 00 00       	call   1698 <std::__n4861::suspend_always::await_suspend(std::__n4861::coroutine_handle<void>)>
+    149c:	eb 3f                	jmp    14dd
+    149e:	eb 10                	jmp    14b0
+    14a0:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]        ; AWAIT_FINAL_DESTROY; coroutine_state == 6
+    14a4:	48 83 c0 30          	add    rax,0x30
+    14a8:	48 89 c7             	mov    rdi,rax
+    14ab:	e8 f8 01 00 00       	call   16a8 <std::__n4861::suspend_always::await_resume()>
+
+    14b0:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]        ; DESTROY
+    14b4:	48 83 c0 10          	add    rax,0x10
+    14b8:	48 89 c7             	mov    rdi,rax
+    14bb:	e8 6c 04 00 00       	call   192c <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::~Promise()>
+    14c0:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    14c4:	0f b6 40 12          	movzx  eax,BYTE PTR [rax+0x12]
+    14c8:	0f b6 c0             	movzx  eax,al
+    14cb:	85 c0                	test   eax,eax
+    14cd:	74 59                	je     1528
+    14cf:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    14d3:	48 89 c7             	mov    rdi,rax
+    14d6:	e8 75 fb ff ff       	call   1050 <operator delete(void*)@plt>
+    14db:	eb 4b                	jmp    1528                            ; goto RETURN
+    14dd:	eb 49                	jmp    1528
+
+; exception handler
+    14df:	48 89 c7             	mov    rdi,rax
+    14e2:	e8 59 fb ff ff       	call   1040 <__cxa_begin_catch@plt>
+    14e7:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    14eb:	0f b6 40 22          	movzx  eax,BYTE PTR [rax+0x22]
+    14ef:	83 f0 01             	xor    eax,0x1
+    14f2:	84 c0                	test   al,al
+    14f4:	74 05                	je     14fb
+    14f6:	e8 75 fb ff ff       	call   1070 <__cxa_rethrow@plt>
+    14fb:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    14ff:	48 83 c0 10          	add    rax,0x10
+    1503:	48 89 c7             	mov    rdi,rax
+    1506:	e8 ff 02 00 00       	call   180a <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::unhandled_exception()>
+    150b:	e8 80 fb ff ff       	call   1090 <__cxa_end_catch@plt>
+    1510:	e9 30 ff ff ff       	jmp    1445
+    1515:	48 89 c3             	mov    rbx,rax
+    1518:	e8 73 fb ff ff       	call   1090 <__cxa_end_catch@plt>
+    151d:	48 89 d8             	mov    rax,rbx
+    1520:	48 89 c7             	mov    rdi,rax
+    1523:	e8 78 fb ff ff       	call   10a0 <_Unwind_Resume@plt>
+
+    1528:	90                   	nop                                    ; RETURN
+    1529:	48 8b 5d f8          	mov    rbx,QWORD PTR [rbp-0x8]
+    152d:	c9                   	leave
+    152e:	c3                   	ret

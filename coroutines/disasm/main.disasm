@@ -1,0 +1,1254 @@
+
+main:     file format elf64-x86-64
+
+
+Disassembly of section .init:
+
+0000000000001000 <_init>:
+_init():
+    1000:	48 83 ec 08          	sub    rsp,0x8
+    1004:	48 8b 05 e5 2f 00 00 	mov    rax,QWORD PTR [rip+0x2fe5]        # 3ff0 <__gmon_start__>
+    100b:	48 85 c0             	test   rax,rax
+    100e:	74 02                	je     1012 <_init+0x12>
+    1010:	ff d0                	call   rax
+    1012:	48 83 c4 08          	add    rsp,0x8
+    1016:	c3                   	ret    
+
+Disassembly of section .plt:
+
+0000000000001020 <.plt>:
+    1020:	ff 35 e2 2f 00 00    	push   QWORD PTR [rip+0x2fe2]        # 4008 <_GLOBAL_OFFSET_TABLE_+0x8>
+    1026:	ff 25 e4 2f 00 00    	jmp    QWORD PTR [rip+0x2fe4]        # 4010 <_GLOBAL_OFFSET_TABLE_+0x10>
+    102c:	0f 1f 40 00          	nop    DWORD PTR [rax+0x0]
+
+0000000000001030 <printf@plt>:
+    1030:	ff 25 e2 2f 00 00    	jmp    QWORD PTR [rip+0x2fe2]        # 4018 <printf@GLIBC_2.2.5>
+    1036:	68 00 00 00 00       	push   0x0
+    103b:	e9 e0 ff ff ff       	jmp    1020 <.plt>
+
+0000000000001040 <__cxa_begin_catch@plt>:
+    1040:	ff 25 da 2f 00 00    	jmp    QWORD PTR [rip+0x2fda]        # 4020 <__cxa_begin_catch@CXXABI_1.3>
+    1046:	68 01 00 00 00       	push   0x1
+    104b:	e9 d0 ff ff ff       	jmp    1020 <.plt>
+
+0000000000001050 <operator delete(void*)@plt>:
+    1050:	ff 25 d2 2f 00 00    	jmp    QWORD PTR [rip+0x2fd2]        # 4028 <operator delete(void*)@GLIBCXX_3.4>
+    1056:	68 02 00 00 00       	push   0x2
+    105b:	e9 c0 ff ff ff       	jmp    1020 <.plt>
+
+0000000000001060 <operator new(unsigned long)@plt>:
+    1060:	ff 25 ca 2f 00 00    	jmp    QWORD PTR [rip+0x2fca]        # 4030 <operator new(unsigned long)@GLIBCXX_3.4>
+    1066:	68 03 00 00 00       	push   0x3
+    106b:	e9 b0 ff ff ff       	jmp    1020 <.plt>
+
+0000000000001070 <__cxa_rethrow@plt>:
+    1070:	ff 25 c2 2f 00 00    	jmp    QWORD PTR [rip+0x2fc2]        # 4038 <__cxa_rethrow@CXXABI_1.3>
+    1076:	68 04 00 00 00       	push   0x4
+    107b:	e9 a0 ff ff ff       	jmp    1020 <.plt>
+
+0000000000001080 <puts@plt>:
+    1080:	ff 25 ba 2f 00 00    	jmp    QWORD PTR [rip+0x2fba]        # 4040 <puts@GLIBC_2.2.5>
+    1086:	68 05 00 00 00       	push   0x5
+    108b:	e9 90 ff ff ff       	jmp    1020 <.plt>
+
+0000000000001090 <__cxa_end_catch@plt>:
+    1090:	ff 25 b2 2f 00 00    	jmp    QWORD PTR [rip+0x2fb2]        # 4048 <__cxa_end_catch@CXXABI_1.3>
+    1096:	68 06 00 00 00       	push   0x6
+    109b:	e9 80 ff ff ff       	jmp    1020 <.plt>
+
+00000000000010a0 <_Unwind_Resume@plt>:
+    10a0:	ff 25 aa 2f 00 00    	jmp    QWORD PTR [rip+0x2faa]        # 4050 <_Unwind_Resume@GCC_3.0>
+    10a6:	68 07 00 00 00       	push   0x7
+    10ab:	e9 70 ff ff ff       	jmp    1020 <.plt>
+
+Disassembly of section .plt.got:
+
+00000000000010b0 <__cxa_finalize@plt>:
+    10b0:	ff 25 22 2f 00 00    	jmp    QWORD PTR [rip+0x2f22]        # 3fd8 <__cxa_finalize@GLIBC_2.2.5>
+    10b6:	66 90                	xchg   ax,ax
+
+Disassembly of section .text:
+
+00000000000010c0 <_start>:
+_start():
+    10c0:	31 ed                	xor    ebp,ebp
+    10c2:	49 89 d1             	mov    r9,rdx
+    10c5:	5e                   	pop    rsi
+    10c6:	48 89 e2             	mov    rdx,rsp
+    10c9:	48 83 e4 f0          	and    rsp,0xfffffffffffffff0
+    10cd:	50                   	push   rax
+    10ce:	54                   	push   rsp
+    10cf:	4c 8d 05 ea 09 00 00 	lea    r8,[rip+0x9ea]        # 1ac0 <__libc_csu_fini>
+    10d6:	48 8d 0d 83 09 00 00 	lea    rcx,[rip+0x983]        # 1a60 <__libc_csu_init>
+    10dd:	48 8d 3d 7a 04 00 00 	lea    rdi,[rip+0x47a]        # 155e <main>
+    10e4:	ff 15 fe 2e 00 00    	call   QWORD PTR [rip+0x2efe]        # 3fe8 <__libc_start_main@GLIBC_2.2.5>
+    10ea:	f4                   	hlt    
+    10eb:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+00000000000010f0 <deregister_tm_clones>:
+deregister_tm_clones():
+    10f0:	48 8d 3d 99 2f 00 00 	lea    rdi,[rip+0x2f99]        # 4090 <__TMC_END__>
+    10f7:	48 8d 05 92 2f 00 00 	lea    rax,[rip+0x2f92]        # 4090 <__TMC_END__>
+    10fe:	48 39 f8             	cmp    rax,rdi
+    1101:	74 15                	je     1118 <deregister_tm_clones+0x28>
+    1103:	48 8b 05 d6 2e 00 00 	mov    rax,QWORD PTR [rip+0x2ed6]        # 3fe0 <_ITM_deregisterTMCloneTable>
+    110a:	48 85 c0             	test   rax,rax
+    110d:	74 09                	je     1118 <deregister_tm_clones+0x28>
+    110f:	ff e0                	jmp    rax
+    1111:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+    1118:	c3                   	ret    
+    1119:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+
+0000000000001120 <register_tm_clones>:
+register_tm_clones():
+    1120:	48 8d 3d 69 2f 00 00 	lea    rdi,[rip+0x2f69]        # 4090 <__TMC_END__>
+    1127:	48 8d 35 62 2f 00 00 	lea    rsi,[rip+0x2f62]        # 4090 <__TMC_END__>
+    112e:	48 29 fe             	sub    rsi,rdi
+    1131:	48 89 f0             	mov    rax,rsi
+    1134:	48 c1 ee 3f          	shr    rsi,0x3f
+    1138:	48 c1 f8 03          	sar    rax,0x3
+    113c:	48 01 c6             	add    rsi,rax
+    113f:	48 d1 fe             	sar    rsi,1
+    1142:	74 14                	je     1158 <register_tm_clones+0x38>
+    1144:	48 8b 05 ad 2e 00 00 	mov    rax,QWORD PTR [rip+0x2ead]        # 3ff8 <_ITM_registerTMCloneTable>
+    114b:	48 85 c0             	test   rax,rax
+    114e:	74 08                	je     1158 <register_tm_clones+0x38>
+    1150:	ff e0                	jmp    rax
+    1152:	66 0f 1f 44 00 00    	nop    WORD PTR [rax+rax*1+0x0]
+    1158:	c3                   	ret    
+    1159:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+
+0000000000001160 <__do_global_dtors_aux>:
+__do_global_dtors_aux():
+    1160:	80 3d 29 2f 00 00 00 	cmp    BYTE PTR [rip+0x2f29],0x0        # 4090 <__TMC_END__>
+    1167:	75 2f                	jne    1198 <__do_global_dtors_aux+0x38>
+    1169:	55                   	push   rbp
+    116a:	48 83 3d 66 2e 00 00 	cmp    QWORD PTR [rip+0x2e66],0x0        # 3fd8 <__cxa_finalize@GLIBC_2.2.5>
+    1171:	00 
+    1172:	48 89 e5             	mov    rbp,rsp
+    1175:	74 0c                	je     1183 <__do_global_dtors_aux+0x23>
+    1177:	48 8b 3d ea 2e 00 00 	mov    rdi,QWORD PTR [rip+0x2eea]        # 4068 <__dso_handle>
+    117e:	e8 2d ff ff ff       	call   10b0 <__cxa_finalize@plt>
+    1183:	e8 68 ff ff ff       	call   10f0 <deregister_tm_clones>
+    1188:	c6 05 01 2f 00 00 01 	mov    BYTE PTR [rip+0x2f01],0x1        # 4090 <__TMC_END__>
+    118f:	5d                   	pop    rbp
+    1190:	c3                   	ret    
+    1191:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+    1198:	c3                   	ret    
+    1199:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+
+00000000000011a0 <frame_dummy>:
+frame_dummy():
+    11a0:	e9 7b ff ff ff       	jmp    1120 <register_tm_clones>
+
+00000000000011a5 <std::__n4861::__dummy_resume_destroy()>:
+std::__n4861::__dummy_resume_destroy():
+/usr/include/c++/10/coroutine:222
+  struct noop_coroutine_promise
+  {
+  };
+
+  void __dummy_resume_destroy() __attribute__((__weak__));
+  void __dummy_resume_destroy() {}
+    11a5:	55                   	push   rbp
+    11a6:	48 89 e5             	mov    rbp,rsp
+    11a9:	90                   	nop
+    11aa:	5d                   	pop    rbp
+    11ab:	c3                   	ret    
+
+00000000000011ac <co_await_test(bool, bool)>:
+co_await_test(bool, bool):
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:141
+using ResultAN = Result<std::suspend_always, std::suspend_never>;
+using ResultNN = Result<std::suspend_never, std::suspend_never>;
+using ResultNA = Result<std::suspend_never, std::suspend_always>;
+
+ResultAA co_await_test(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND)
+{
+    11ac:	55                   	push   rbp
+    11ad:	48 89 e5             	mov    rbp,rsp
+    11b0:	48 83 ec 20          	sub    rsp,0x20
+    11b4:	48 89 7d e8          	mov    QWORD PTR [rbp-0x18],rdi
+    11b8:	89 f1                	mov    ecx,esi
+    11ba:	89 d0                	mov    eax,edx
+    11bc:	89 ca                	mov    edx,ecx
+    11be:	88 55 e4             	mov    BYTE PTR [rbp-0x1c],dl
+    11c1:	88 45 e0             	mov    BYTE PTR [rbp-0x20],al
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140
+ResultAA co_await_test(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND)
+    11c4:	48 c7 45 f8 00 00 00 	mov    QWORD PTR [rbp-0x8],0x0
+    11cb:	00 
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145
+    int ares = co_await 1;
+    printf("co_await -> %d\n", ares);
+    co_return 1;
+}
+    11cc:	b8 38 00 00 00       	mov    eax,0x38
+    11d1:	48 89 c7             	mov    rdi,rax
+    11d4:	e8 87 fe ff ff       	call   1060 <operator new(unsigned long)@plt>
+    11d9:	48 89 45 f8          	mov    QWORD PTR [rbp-0x8],rax
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140
+ResultAA co_await_test(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND)
+    11dd:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    11e1:	c6 40 12 01          	mov    BYTE PTR [rax+0x12],0x1
+    11e5:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    11e9:	48 8d 15 76 00 00 00 	lea    rdx,[rip+0x76]        # 1266 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)>
+    11f0:	48 89 10             	mov    QWORD PTR [rax],rdx
+    11f3:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    11f7:	48 8d 15 31 03 00 00 	lea    rdx,[rip+0x331]        # 152f <_Z13co_await_testbb.destroy(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)>
+    11fe:	48 89 50 08          	mov    QWORD PTR [rax+0x8],rdx
+    1202:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1206:	0f b6 55 e4          	movzx  edx,BYTE PTR [rbp-0x1c]
+    120a:	88 50 20             	mov    BYTE PTR [rax+0x20],dl
+    120d:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1211:	0f b6 55 e0          	movzx  edx,BYTE PTR [rbp-0x20]
+    1215:	88 50 21             	mov    BYTE PTR [rax+0x21],dl
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145
+}
+    1218:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    121c:	48 8d 48 10          	lea    rcx,[rax+0x10]
+    1220:	0f b6 55 e0          	movzx  edx,BYTE PTR [rbp-0x20]
+    1224:	0f b6 45 e4          	movzx  eax,BYTE PTR [rbp-0x1c]
+    1228:	89 c6                	mov    esi,eax
+    122a:	48 89 cf             	mov    rdi,rcx
+    122d:	e8 18 06 00 00       	call   184a <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::Promise(bool, bool)>
+    1232:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1236:	48 8d 50 10          	lea    rdx,[rax+0x10]
+    123a:	48 8b 45 e8          	mov    rax,QWORD PTR [rbp-0x18]
+    123e:	48 89 d6             	mov    rsi,rdx
+    1241:	48 89 c7             	mov    rdi,rax
+    1244:	e8 49 06 00 00       	call   1892 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::get_return_object()>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140
+ResultAA co_await_test(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND)
+    1249:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    124d:	66 c7 40 14 00 00    	mov    WORD PTR [rax+0x14],0x0
+    1253:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1257:	48 89 c7             	mov    rdi,rax
+    125a:	e8 07 00 00 00       	call   1266 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145
+}
+    125f:	90                   	nop
+    1260:	48 8b 45 e8          	mov    rax,QWORD PTR [rbp-0x18]
+    1264:	c9                   	leave  
+    1265:	c3                   	ret    
+
+0000000000001266 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)>:
+_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*):
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145
+    1266:	55                   	push   rbp
+    1267:	48 89 e5             	mov    rbp,rsp
+    126a:	53                   	push   rbx
+    126b:	48 83 ec 28          	sub    rsp,0x28
+    126f:	48 89 7d d8          	mov    QWORD PTR [rbp-0x28],rdi
+    1273:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1277:	0f b7 40 14          	movzx  eax,WORD PTR [rax+0x14]
+    127b:	83 e0 01             	and    eax,0x1
+    127e:	66 85 c0             	test   ax,ax
+    1281:	74 2d                	je     12b0 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x4a>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 1)
+    1283:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1287:	0f b7 40 14          	movzx  eax,WORD PTR [rax+0x14]
+    128b:	0f b7 c0             	movzx  eax,ax
+    128e:	83 f8 07             	cmp    eax,0x7
+    1291:	0f 84 07 02 00 00    	je     149e <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x238>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145
+    1297:	83 f8 07             	cmp    eax,0x7
+    129a:	7f 12                	jg     12ae <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x48>
+    129c:	83 f8 03             	cmp    eax,0x3
+    129f:	0f 84 ae 00 00 00    	je     1353 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0xed>
+    12a5:	83 f8 05             	cmp    eax,0x5
+    12a8:	0f 84 2a 01 00 00    	je     13d8 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x172>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140 (discriminator 1)
+ResultAA co_await_test(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND)
+    12ae:	0f 0b                	ud2    
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 2)
+}
+    12b0:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    12b4:	0f b7 40 14          	movzx  eax,WORD PTR [rax+0x14]
+    12b8:	0f b7 c0             	movzx  eax,ax
+    12bb:	83 f8 06             	cmp    eax,0x6
+    12be:	0f 84 dc 01 00 00    	je     14a0 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x23a>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145
+    12c4:	83 f8 06             	cmp    eax,0x6
+    12c7:	7f 47                	jg     1310 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0xaa>
+    12c9:	83 f8 04             	cmp    eax,0x4
+    12cc:	0f 84 0d 01 00 00    	je     13df <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x179>
+    12d2:	83 f8 04             	cmp    eax,0x4
+    12d5:	7f 39                	jg     1310 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0xaa>
+    12d7:	85 c0                	test   eax,eax
+    12d9:	74 07                	je     12e2 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x7c>
+    12db:	83 f8 02             	cmp    eax,0x2
+    12de:	74 78                	je     1358 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0xf2>
+    12e0:	eb 2e                	jmp    1310 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0xaa>
+    12e2:	48 8b 5d d8          	mov    rbx,QWORD PTR [rbp-0x28]
+    12e6:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    12ea:	48 89 c7             	mov    rdi,rax
+    12ed:	e8 1c 06 00 00       	call   190e <std::__n4861::coroutine_handle<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::from_address(void*)>
+    12f2:	48 89 43 18          	mov    QWORD PTR [rbx+0x18],rax
+    12f6:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    12fa:	c6 40 22 00          	mov    BYTE PTR [rax+0x22],0x0
+    12fe:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1302:	48 83 c0 10          	add    rax,0x10
+    1306:	48 89 c7             	mov    rdi,rax
+    1309:	e8 da 04 00 00       	call   17e8 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::initial_suspend() const>
+    130e:	eb 02                	jmp    1312 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0xac>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140 (discriminator 4)
+ResultAA co_await_test(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND)
+    1310:	0f 0b                	ud2    
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 4)
+}
+    1312:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1316:	48 83 c0 23          	add    rax,0x23
+    131a:	48 89 c7             	mov    rdi,rax
+    131d:	e8 66 03 00 00       	call   1688 <std::__n4861::suspend_always::await_ready()>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140 (discriminator 4)
+ResultAA co_await_test(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND)
+    1322:	83 f0 01             	xor    eax,0x1
+    1325:	84 c0                	test   al,al
+    1327:	74 2f                	je     1358 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0xf2>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140 (discriminator 7)
+    1329:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    132d:	66 c7 40 14 02 00    	mov    WORD PTR [rax+0x14],0x2
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 7)
+}
+    1333:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1337:	48 8d 50 23          	lea    rdx,[rax+0x23]
+    133b:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    133f:	48 8b 40 18          	mov    rax,QWORD PTR [rax+0x18]
+    1343:	48 89 c6             	mov    rsi,rax
+    1346:	48 89 d7             	mov    rdi,rdx
+    1349:	e8 4a 03 00 00       	call   1698 <std::__n4861::suspend_always::await_suspend(std::__n4861::coroutine_handle<void>)>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140 (discriminator 7)
+ResultAA co_await_test(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND)
+    134e:	e9 8a 01 00 00       	jmp    14dd <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x277>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140
+    1353:	e9 58 01 00 00       	jmp    14b0 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x24a>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140 (discriminator 9)
+    1358:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    135c:	c6 40 22 01          	mov    BYTE PTR [rax+0x22],0x1
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 9)
+}
+    1360:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1364:	48 83 c0 23          	add    rax,0x23
+    1368:	48 89 c7             	mov    rdi,rax
+    136b:	e8 38 03 00 00       	call   16a8 <std::__n4861::suspend_always::await_resume()>
+    1370:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1374:	48 8d 48 10          	lea    rcx,[rax+0x10]
+    1378:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    137c:	48 83 c0 28          	add    rax,0x28
+    1380:	ba 01 00 00 00       	mov    edx,0x1
+    1385:	48 89 ce             	mov    rsi,rcx
+    1388:	48 89 c7             	mov    rdi,rax
+    138b:	e8 24 03 00 00       	call   16b4 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::await_transform(int) const>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:142 (discriminator 9)
+    int ares = co_await 1;
+    1390:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1394:	48 83 c0 28          	add    rax,0x28
+    1398:	48 89 c7             	mov    rdi,rax
+    139b:	e8 86 03 00 00       	call   1726 <Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::await_ready() const>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 9)
+}
+    13a0:	83 f0 01             	xor    eax,0x1
+    13a3:	84 c0                	test   al,al
+    13a5:	74 38                	je     13df <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x179>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 5)
+    13a7:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    13ab:	66 c7 40 14 04 00    	mov    WORD PTR [rax+0x14],0x4
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:142 (discriminator 5)
+    int ares = co_await 1;
+    13b1:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    13b5:	48 8d 50 28          	lea    rdx,[rax+0x28]
+    13b9:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    13bd:	48 8b 40 18          	mov    rax,QWORD PTR [rax+0x18]
+    13c1:	48 89 c6             	mov    rsi,rax
+    13c4:	48 89 d7             	mov    rdi,rdx
+    13c7:	e8 8c 03 00 00       	call   1758 <Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::await_suspend(std::__n4861::coroutine_handle<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>) const>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 5)
+}
+    13cc:	83 f0 01             	xor    eax,0x1
+    13cf:	84 c0                	test   al,al
+    13d1:	75 0c                	jne    13df <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x179>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145
+    13d3:	e9 05 01 00 00       	jmp    14dd <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x277>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 8)
+    13d8:	bb 00 00 00 00       	mov    ebx,0x0
+    13dd:	eb 1c                	jmp    13fb <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x195>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:142 (discriminator 11)
+    int ares = co_await 1;
+    13df:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    13e3:	48 83 c0 28          	add    rax,0x28
+    13e7:	48 89 c7             	mov    rdi,rax
+    13ea:	e8 a1 03 00 00       	call   1790 <Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::await_resume() const>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 11)
+}
+    13ef:	48 8b 55 d8          	mov    rdx,QWORD PTR [rbp-0x28]
+    13f3:	89 42 24             	mov    DWORD PTR [rdx+0x24],eax
+    13f6:	bb 01 00 00 00       	mov    ebx,0x1
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 14)
+    13fb:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    13ff:	48 83 c0 28          	add    rax,0x28
+    1403:	48 89 c7             	mov    rdi,rax
+    1406:	e8 f3 02 00 00       	call   16fe <Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::~Awaitable()>
+    140b:	83 fb 01             	cmp    ebx,0x1
+    140e:	0f 85 9c 00 00 00    	jne    14b0 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x24a>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145
+    1414:	90                   	nop
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:143
+    printf("co_await -> %d\n", ares);
+    1415:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1419:	8b 40 24             	mov    eax,DWORD PTR [rax+0x24]
+    141c:	89 c6                	mov    esi,eax
+    141e:	48 8d 3d e7 0b 00 00 	lea    rdi,[rip+0xbe7]        # 200c <AWAIT_NOT_SUSPEND+0x1>
+    1425:	b8 00 00 00 00       	mov    eax,0x0
+    142a:	e8 01 fc ff ff       	call   1030 <printf@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:144
+    co_return 1;
+    142f:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1433:	48 83 c0 10          	add    rax,0x10
+    1437:	be 01 00 00 00       	mov    esi,0x1
+    143c:	48 89 c7             	mov    rdi,rax
+    143f:	e8 7c 03 00 00       	call   17c0 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::return_value(int)>
+    1444:	90                   	nop
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 15)
+}
+    1445:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1449:	48 c7 00 00 00 00 00 	mov    QWORD PTR [rax],0x0
+    1450:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1454:	48 83 c0 10          	add    rax,0x10
+    1458:	48 89 c7             	mov    rdi,rax
+    145b:	e8 c8 03 00 00       	call   1828 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::final_suspend() const>
+    1460:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1464:	48 83 c0 30          	add    rax,0x30
+    1468:	48 89 c7             	mov    rdi,rax
+    146b:	e8 18 02 00 00       	call   1688 <std::__n4861::suspend_always::await_ready()>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140 (discriminator 15)
+ResultAA co_await_test(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND)
+    1470:	83 f0 01             	xor    eax,0x1
+    1473:	84 c0                	test   al,al
+    1475:	74 29                	je     14a0 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x23a>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140 (discriminator 11)
+    1477:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    147b:	66 c7 40 14 06 00    	mov    WORD PTR [rax+0x14],0x6
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 11)
+}
+    1481:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    1485:	48 8d 50 30          	lea    rdx,[rax+0x30]
+    1489:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    148d:	48 8b 40 18          	mov    rax,QWORD PTR [rax+0x18]
+    1491:	48 89 c6             	mov    rsi,rax
+    1494:	48 89 d7             	mov    rdi,rdx
+    1497:	e8 fc 01 00 00       	call   1698 <std::__n4861::suspend_always::await_suspend(std::__n4861::coroutine_handle<void>)>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140 (discriminator 11)
+ResultAA co_await_test(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND)
+    149c:	eb 3f                	jmp    14dd <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x277>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140
+    149e:	eb 10                	jmp    14b0 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x24a>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145
+}
+    14a0:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    14a4:	48 83 c0 30          	add    rax,0x30
+    14a8:	48 89 c7             	mov    rdi,rax
+    14ab:	e8 f8 01 00 00       	call   16a8 <std::__n4861::suspend_always::await_resume()>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 17)
+    14b0:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    14b4:	48 83 c0 10          	add    rax,0x10
+    14b8:	48 89 c7             	mov    rdi,rax
+    14bb:	e8 6c 04 00 00       	call   192c <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::~Promise()>
+    14c0:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    14c4:	0f b6 40 12          	movzx  eax,BYTE PTR [rax+0x12]
+    14c8:	0f b6 c0             	movzx  eax,al
+    14cb:	85 c0                	test   eax,eax
+    14cd:	74 59                	je     1528 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x2c2>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 19)
+    14cf:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    14d3:	48 89 c7             	mov    rdi,rax
+    14d6:	e8 75 fb ff ff       	call   1050 <operator delete(void*)@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140 (discriminator 19)
+ResultAA co_await_test(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND)
+    14db:	eb 4b                	jmp    1528 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x2c2>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140 (discriminator 8)
+    14dd:	eb 49                	jmp    1528 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x2c2>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145
+}
+    14df:	48 89 c7             	mov    rdi,rax
+    14e2:	e8 59 fb ff ff       	call   1040 <__cxa_begin_catch@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140
+ResultAA co_await_test(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND)
+    14e7:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    14eb:	0f b6 40 22          	movzx  eax,BYTE PTR [rax+0x22]
+    14ef:	83 f0 01             	xor    eax,0x1
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145
+}
+    14f2:	84 c0                	test   al,al
+    14f4:	74 05                	je     14fb <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x295>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 21)
+    14f6:	e8 75 fb ff ff       	call   1070 <__cxa_rethrow@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 22)
+    14fb:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    14ff:	48 83 c0 10          	add    rax,0x10
+    1503:	48 89 c7             	mov    rdi,rax
+    1506:	e8 ff 02 00 00       	call   180a <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::unhandled_exception()>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145 (discriminator 25)
+    150b:	e8 80 fb ff ff       	call   1090 <__cxa_end_catch@plt>
+    1510:	e9 30 ff ff ff       	jmp    1445 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)+0x1df>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145
+    1515:	48 89 c3             	mov    rbx,rax
+    1518:	e8 73 fb ff ff       	call   1090 <__cxa_end_catch@plt>
+    151d:	48 89 d8             	mov    rax,rbx
+    1520:	48 89 c7             	mov    rdi,rax
+    1523:	e8 78 fb ff ff       	call   10a0 <_Unwind_Resume@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140
+ResultAA co_await_test(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND)
+    1528:	90                   	nop
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145
+}
+    1529:	48 8b 5d f8          	mov    rbx,QWORD PTR [rbp-0x8]
+    152d:	c9                   	leave  
+    152e:	c3                   	ret    
+
+000000000000152f <_Z13co_await_testbb.destroy(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)>:
+_Z13co_await_testbb.destroy(co_await_test(bool, bool)::_Z13co_await_testbb.frame*):
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145
+    152f:	55                   	push   rbp
+    1530:	48 89 e5             	mov    rbp,rsp
+    1533:	48 83 ec 10          	sub    rsp,0x10
+    1537:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:140
+ResultAA co_await_test(bool = AWAIT_NOT_READY, bool = AWAIT_SUSPEND)
+    153b:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    153f:	0f b7 40 14          	movzx  eax,WORD PTR [rax+0x14]
+    1543:	83 c8 01             	or     eax,0x1
+    1546:	89 c2                	mov    edx,eax
+    1548:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    154c:	66 89 50 14          	mov    WORD PTR [rax+0x14],dx
+    1550:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1554:	48 89 c7             	mov    rdi,rax
+    1557:	e8 0a fd ff ff       	call   1266 <_Z13co_await_testbb.actor(co_await_test(bool, bool)::_Z13co_await_testbb.frame*)>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:145
+}
+    155c:	c9                   	leave  
+    155d:	c3                   	ret    
+
+000000000000155e <main>:
+main():
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:148
+
+int main(void)
+{
+    155e:	55                   	push   rbp
+    155f:	48 89 e5             	mov    rbp,rsp
+    1562:	53                   	push   rbx
+    1563:	48 83 ec 18          	sub    rsp,0x18
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:149
+    auto r = co_await_test();
+    1567:	48 8d 45 e8          	lea    rax,[rbp-0x18]
+    156b:	ba 01 00 00 00       	mov    edx,0x1
+    1570:	be 00 00 00 00       	mov    esi,0x0
+    1575:	48 89 c7             	mov    rdi,rax
+    1578:	e8 2f fc ff ff       	call   11ac <co_await_test(bool, bool)>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:151
+
+    printf("  [initially suspended] done:%d\n", r.done());
+    157d:	48 8d 45 e8          	lea    rax,[rbp-0x18]
+    1581:	48 89 c7             	mov    rdi,rax
+    1584:	e8 cb 03 00 00       	call   1954 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::done()>
+    1589:	0f b6 c0             	movzx  eax,al
+    158c:	89 c6                	mov    esi,eax
+    158e:	48 8d 3d 8b 0a 00 00 	lea    rdi,[rip+0xa8b]        # 2020 <AWAIT_NOT_SUSPEND+0x15>
+    1595:	b8 00 00 00 00       	mov    eax,0x0
+    159a:	e8 91 fa ff ff       	call   1030 <printf@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:152
+    r.resume();
+    159f:	48 8d 45 e8          	lea    rax,[rbp-0x18]
+    15a3:	48 89 c7             	mov    rdi,rax
+    15a6:	e8 d7 03 00 00       	call   1982 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::resume()>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:154
+
+    printf("  [co_await suspended] done:%d\n", r.done());
+    15ab:	48 8d 45 e8          	lea    rax,[rbp-0x18]
+    15af:	48 89 c7             	mov    rdi,rax
+    15b2:	e8 9d 03 00 00       	call   1954 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::done()>
+    15b7:	0f b6 c0             	movzx  eax,al
+    15ba:	89 c6                	mov    esi,eax
+    15bc:	48 8d 3d 85 0a 00 00 	lea    rdi,[rip+0xa85]        # 2048 <AWAIT_NOT_SUSPEND+0x3d>
+    15c3:	b8 00 00 00 00       	mov    eax,0x0
+    15c8:	e8 63 fa ff ff       	call   1030 <printf@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:155
+    r.resume();
+    15cd:	48 8d 45 e8          	lea    rax,[rbp-0x18]
+    15d1:	48 89 c7             	mov    rdi,rax
+    15d4:	e8 a9 03 00 00       	call   1982 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::resume()>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:157
+
+    printf("  [finally suspended] done:%d\n", r.done());
+    15d9:	48 8d 45 e8          	lea    rax,[rbp-0x18]
+    15dd:	48 89 c7             	mov    rdi,rax
+    15e0:	e8 6f 03 00 00       	call   1954 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::done()>
+    15e5:	0f b6 c0             	movzx  eax,al
+    15e8:	89 c6                	mov    esi,eax
+    15ea:	48 8d 3d 77 0a 00 00 	lea    rdi,[rip+0xa77]        # 2068 <AWAIT_NOT_SUSPEND+0x5d>
+    15f1:	b8 00 00 00 00       	mov    eax,0x0
+    15f6:	e8 35 fa ff ff       	call   1030 <printf@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:158
+    return 0;
+    15fb:	bb 00 00 00 00       	mov    ebx,0x0
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:149
+    auto r = co_await_test();
+    1600:	48 8d 45 e8          	lea    rax,[rbp-0x18]
+    1604:	48 89 c7             	mov    rdi,rax
+    1607:	e8 bc 02 00 00       	call   18c8 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::~Result()>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:159
+}
+    160c:	89 d8                	mov    eax,ebx
+    160e:	eb 1a                	jmp    162a <main+0xcc>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:149
+    auto r = co_await_test();
+    1610:	48 89 c3             	mov    rbx,rax
+    1613:	48 8d 45 e8          	lea    rax,[rbp-0x18]
+    1617:	48 89 c7             	mov    rdi,rax
+    161a:	e8 a9 02 00 00       	call   18c8 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::~Result()>
+    161f:	48 89 d8             	mov    rax,rbx
+    1622:	48 89 c7             	mov    rdi,rax
+    1625:	e8 76 fa ff ff       	call   10a0 <_Unwind_Resume@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:159
+}
+    162a:	48 8b 5d f8          	mov    rbx,QWORD PTR [rbp-0x8]
+    162e:	c9                   	leave  
+    162f:	c3                   	ret    
+
+0000000000001630 <std::__n4861::coroutine_handle<void>::done() const>:
+std::__n4861::coroutine_handle<void>::done() const:
+/usr/include/c++/10/coroutine:121
+      bool done() const noexcept { return __builtin_coro_done(_M_fr_ptr); }
+    1630:	55                   	push   rbp
+    1631:	48 89 e5             	mov    rbp,rsp
+    1634:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    1638:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    163c:	48 8b 00             	mov    rax,QWORD PTR [rax]
+    163f:	48 8b 00             	mov    rax,QWORD PTR [rax]
+    1642:	48 85 c0             	test   rax,rax
+    1645:	0f 94 c0             	sete   al
+    1648:	5d                   	pop    rbp
+    1649:	c3                   	ret    
+
+000000000000164a <std::__n4861::coroutine_handle<void>::resume() const>:
+std::__n4861::coroutine_handle<void>::resume() const:
+/usr/include/c++/10/coroutine:126
+      void resume() const { __builtin_coro_resume(_M_fr_ptr); }
+    164a:	55                   	push   rbp
+    164b:	48 89 e5             	mov    rbp,rsp
+    164e:	48 83 ec 10          	sub    rsp,0x10
+    1652:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    1656:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    165a:	48 8b 00             	mov    rax,QWORD PTR [rax]
+    165d:	48 8b 10             	mov    rdx,QWORD PTR [rax]
+    1660:	48 89 c7             	mov    rdi,rax
+    1663:	ff d2                	call   rdx
+    1665:	90                   	nop
+    1666:	c9                   	leave  
+    1667:	c3                   	ret    
+
+0000000000001668 <std::__n4861::coroutine_handle<void>::destroy() const>:
+std::__n4861::coroutine_handle<void>::destroy() const:
+/usr/include/c++/10/coroutine:128
+      void destroy() const { __builtin_coro_destroy(_M_fr_ptr); }
+    1668:	55                   	push   rbp
+    1669:	48 89 e5             	mov    rbp,rsp
+    166c:	48 83 ec 10          	sub    rsp,0x10
+    1670:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    1674:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1678:	48 8b 00             	mov    rax,QWORD PTR [rax]
+    167b:	48 8b 50 08          	mov    rdx,QWORD PTR [rax+0x8]
+    167f:	48 89 c7             	mov    rdi,rax
+    1682:	ff d2                	call   rdx
+    1684:	90                   	nop
+    1685:	c9                   	leave  
+    1686:	c3                   	ret    
+    1687:	90                   	nop
+
+0000000000001688 <std::__n4861::suspend_always::await_ready()>:
+std::__n4861::suspend_always::await_ready():
+/usr/include/c++/10/coroutine:276
+
+  // 17.12.5 Trivial awaitables
+  /// [coroutine.trivial.awaitables]
+  struct suspend_always
+  {
+    bool await_ready() { return false; }
+    1688:	55                   	push   rbp
+    1689:	48 89 e5             	mov    rbp,rsp
+    168c:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    1690:	b8 00 00 00 00       	mov    eax,0x0
+    1695:	5d                   	pop    rbp
+    1696:	c3                   	ret    
+    1697:	90                   	nop
+
+0000000000001698 <std::__n4861::suspend_always::await_suspend(std::__n4861::coroutine_handle<void>)>:
+std::__n4861::suspend_always::await_suspend(std::__n4861::coroutine_handle<void>):
+/usr/include/c++/10/coroutine:278
+
+    void await_suspend(coroutine_handle<>) {}
+    1698:	55                   	push   rbp
+    1699:	48 89 e5             	mov    rbp,rsp
+    169c:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    16a0:	48 89 75 f0          	mov    QWORD PTR [rbp-0x10],rsi
+    16a4:	90                   	nop
+    16a5:	5d                   	pop    rbp
+    16a6:	c3                   	ret    
+    16a7:	90                   	nop
+
+00000000000016a8 <std::__n4861::suspend_always::await_resume()>:
+std::__n4861::suspend_always::await_resume():
+/usr/include/c++/10/coroutine:280
+
+    void await_resume() {}
+    16a8:	55                   	push   rbp
+    16a9:	48 89 e5             	mov    rbp,rsp
+    16ac:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    16b0:	90                   	nop
+    16b1:	5d                   	pop    rbp
+    16b2:	c3                   	ret    
+    16b3:	90                   	nop
+
+00000000000016b4 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::await_transform(int) const>:
+Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::await_transform(int) const:
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:57
+        Awaitable<Promise> await_transform(int resume) const noexcept {
+    16b4:	55                   	push   rbp
+    16b5:	48 89 e5             	mov    rbp,rsp
+    16b8:	48 83 ec 20          	sub    rsp,0x20
+    16bc:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    16c0:	48 89 75 f0          	mov    QWORD PTR [rbp-0x10],rsi
+    16c4:	89 55 ec             	mov    DWORD PTR [rbp-0x14],edx
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:58
+            printf("Promise::await_transform()\n");
+    16c7:	48 8d 3d b9 09 00 00 	lea    rdi,[rip+0x9b9]        # 2087 <AWAIT_NOT_SUSPEND+0x7c>
+    16ce:	e8 ad f9 ff ff       	call   1080 <puts@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:59
+            return {_ready, _suspend, resume};
+    16d3:	48 8b 45 f0          	mov    rax,QWORD PTR [rbp-0x10]
+    16d7:	0f b6 00             	movzx  eax,BYTE PTR [rax]
+    16da:	0f b6 f0             	movzx  esi,al
+    16dd:	48 8b 45 f0          	mov    rax,QWORD PTR [rbp-0x10]
+    16e1:	0f b6 40 01          	movzx  eax,BYTE PTR [rax+0x1]
+    16e5:	0f b6 d0             	movzx  edx,al
+    16e8:	8b 4d ec             	mov    ecx,DWORD PTR [rbp-0x14]
+    16eb:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    16ef:	48 89 c7             	mov    rdi,rax
+    16f2:	e8 b9 02 00 00       	call   19b0 <Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::Awaitable(bool, bool, int)>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:60
+        }
+    16f7:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    16fb:	c9                   	leave  
+    16fc:	c3                   	ret    
+    16fd:	90                   	nop
+
+00000000000016fe <Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::~Awaitable()>:
+Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::~Awaitable():
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:13
+    ~Awaitable() noexcept {
+    16fe:	55                   	push   rbp
+    16ff:	48 89 e5             	mov    rbp,rsp
+    1702:	48 83 ec 10          	sub    rsp,0x10
+    1706:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:14
+        printf("Awaitable::~Awaitable(); %p\n", (void*)this);
+    170a:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    170e:	48 89 c6             	mov    rsi,rax
+    1711:	48 8d 3d 8a 09 00 00 	lea    rdi,[rip+0x98a]        # 20a2 <AWAIT_NOT_SUSPEND+0x97>
+    1718:	b8 00 00 00 00       	mov    eax,0x0
+    171d:	e8 0e f9 ff ff       	call   1030 <printf@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:15
+    }
+    1722:	90                   	nop
+    1723:	c9                   	leave  
+    1724:	c3                   	ret    
+    1725:	90                   	nop
+
+0000000000001726 <Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::await_ready() const>:
+Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::await_ready() const:
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:17
+    bool await_ready() const noexcept {
+    1726:	55                   	push   rbp
+    1727:	48 89 e5             	mov    rbp,rsp
+    172a:	48 83 ec 10          	sub    rsp,0x10
+    172e:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:18
+        printf("Awaitable::await_ready() -> %d\n", _ready);
+    1732:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1736:	0f b6 00             	movzx  eax,BYTE PTR [rax]
+    1739:	0f b6 c0             	movzx  eax,al
+    173c:	89 c6                	mov    esi,eax
+    173e:	48 8d 3d 7b 09 00 00 	lea    rdi,[rip+0x97b]        # 20c0 <AWAIT_NOT_SUSPEND+0xb5>
+    1745:	b8 00 00 00 00       	mov    eax,0x0
+    174a:	e8 e1 f8 ff ff       	call   1030 <printf@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:19
+        return _ready;
+    174f:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1753:	0f b6 00             	movzx  eax,BYTE PTR [rax]
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:20
+    }
+    1756:	c9                   	leave  
+    1757:	c3                   	ret    
+
+0000000000001758 <Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::await_suspend(std::__n4861::coroutine_handle<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>) const>:
+Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::await_suspend(std::__n4861::coroutine_handle<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>) const:
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:22
+    bool await_suspend(std::coroutine_handle<Promise> h) const noexcept {
+    1758:	55                   	push   rbp
+    1759:	48 89 e5             	mov    rbp,rsp
+    175c:	48 83 ec 10          	sub    rsp,0x10
+    1760:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    1764:	48 89 75 f0          	mov    QWORD PTR [rbp-0x10],rsi
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:23
+        printf("Awaitable::await_suspend() -> %d\n", _suspend);
+    1768:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    176c:	0f b6 40 01          	movzx  eax,BYTE PTR [rax+0x1]
+    1770:	0f b6 c0             	movzx  eax,al
+    1773:	89 c6                	mov    esi,eax
+    1775:	48 8d 3d 64 09 00 00 	lea    rdi,[rip+0x964]        # 20e0 <AWAIT_NOT_SUSPEND+0xd5>
+    177c:	b8 00 00 00 00       	mov    eax,0x0
+    1781:	e8 aa f8 ff ff       	call   1030 <printf@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:24
+        return _suspend;
+    1786:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    178a:	0f b6 40 01          	movzx  eax,BYTE PTR [rax+0x1]
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:25
+    }
+    178e:	c9                   	leave  
+    178f:	c3                   	ret    
+
+0000000000001790 <Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::await_resume() const>:
+Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::await_resume() const:
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:27
+    int await_resume() const noexcept {
+    1790:	55                   	push   rbp
+    1791:	48 89 e5             	mov    rbp,rsp
+    1794:	48 83 ec 10          	sub    rsp,0x10
+    1798:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:28
+        printf("Awaitable::await_resume() -> %d\n", _resume);
+    179c:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    17a0:	8b 40 04             	mov    eax,DWORD PTR [rax+0x4]
+    17a3:	89 c6                	mov    esi,eax
+    17a5:	48 8d 3d 5c 09 00 00 	lea    rdi,[rip+0x95c]        # 2108 <AWAIT_NOT_SUSPEND+0xfd>
+    17ac:	b8 00 00 00 00       	mov    eax,0x0
+    17b1:	e8 7a f8 ff ff       	call   1030 <printf@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:29
+        return _resume;
+    17b6:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    17ba:	8b 40 04             	mov    eax,DWORD PTR [rax+0x4]
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:30
+    }
+    17bd:	c9                   	leave  
+    17be:	c3                   	ret    
+    17bf:	90                   	nop
+
+00000000000017c0 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::return_value(int)>:
+Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::return_value(int):
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:81
+        void return_value(int ret_code) noexcept {
+    17c0:	55                   	push   rbp
+    17c1:	48 89 e5             	mov    rbp,rsp
+    17c4:	48 83 ec 10          	sub    rsp,0x10
+    17c8:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    17cc:	89 75 f4             	mov    DWORD PTR [rbp-0xc],esi
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:82
+            printf("Promise::return_value(); value: %d\n", ret_code);
+    17cf:	8b 45 f4             	mov    eax,DWORD PTR [rbp-0xc]
+    17d2:	89 c6                	mov    esi,eax
+    17d4:	48 8d 3d 55 09 00 00 	lea    rdi,[rip+0x955]        # 2130 <AWAIT_NOT_SUSPEND+0x125>
+    17db:	b8 00 00 00 00       	mov    eax,0x0
+    17e0:	e8 4b f8 ff ff       	call   1030 <printf@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:83
+        }
+    17e5:	90                   	nop
+    17e6:	c9                   	leave  
+    17e7:	c3                   	ret    
+
+00000000000017e8 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::initial_suspend() const>:
+Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::initial_suspend() const:
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:67
+        InitialSuspend initial_suspend() const {
+    17e8:	55                   	push   rbp
+    17e9:	48 89 e5             	mov    rbp,rsp
+    17ec:	53                   	push   rbx
+    17ed:	48 83 ec 18          	sub    rsp,0x18
+    17f1:	48 89 7d e8          	mov    QWORD PTR [rbp-0x18],rdi
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:68
+            printf("Promise::initial_suspend()\n");
+    17f5:	48 8d 3d 58 09 00 00 	lea    rdi,[rip+0x958]        # 2154 <AWAIT_NOT_SUSPEND+0x149>
+    17fc:	e8 7f f8 ff ff       	call   1080 <puts@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:69
+            return {};
+    1801:	90                   	nop
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:70
+        }
+    1802:	89 d8                	mov    eax,ebx
+    1804:	48 8b 5d f8          	mov    rbx,QWORD PTR [rbp-0x8]
+    1808:	c9                   	leave  
+    1809:	c3                   	ret    
+
+000000000000180a <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::unhandled_exception()>:
+Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::unhandled_exception():
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:85
+        void unhandled_exception() {
+    180a:	55                   	push   rbp
+    180b:	48 89 e5             	mov    rbp,rsp
+    180e:	48 83 ec 10          	sub    rsp,0x10
+    1812:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:86
+            printf("Promise::unhandled_exception()\n");
+    1816:	48 8d 3d 53 09 00 00 	lea    rdi,[rip+0x953]        # 2170 <AWAIT_NOT_SUSPEND+0x165>
+    181d:	e8 5e f8 ff ff       	call   1080 <puts@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:87
+            throw;
+    1822:	e8 49 f8 ff ff       	call   1070 <__cxa_rethrow@plt>
+    1827:	90                   	nop
+
+0000000000001828 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::final_suspend() const>:
+Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::final_suspend() const:
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:72
+        FinalSuspend final_suspend() const {
+    1828:	55                   	push   rbp
+    1829:	48 89 e5             	mov    rbp,rsp
+    182c:	53                   	push   rbx
+    182d:	48 83 ec 18          	sub    rsp,0x18
+    1831:	48 89 7d e8          	mov    QWORD PTR [rbp-0x18],rdi
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:73
+            printf("Promise::final_suspend()\n");
+    1835:	48 8d 3d 53 09 00 00 	lea    rdi,[rip+0x953]        # 218f <AWAIT_NOT_SUSPEND+0x184>
+    183c:	e8 3f f8 ff ff       	call   1080 <puts@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:74
+            return {};
+    1841:	90                   	nop
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:75
+        }
+    1842:	89 d8                	mov    eax,ebx
+    1844:	48 8b 5d f8          	mov    rbx,QWORD PTR [rbp-0x8]
+    1848:	c9                   	leave  
+    1849:	c3                   	ret    
+
+000000000000184a <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::Promise(bool, bool)>:
+Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::Promise(bool, bool):
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:47
+        Promise(bool ready, bool suspend) noexcept:
+    184a:	55                   	push   rbp
+    184b:	48 89 e5             	mov    rbp,rsp
+    184e:	48 83 ec 10          	sub    rsp,0x10
+    1852:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    1856:	89 f1                	mov    ecx,esi
+    1858:	89 d0                	mov    eax,edx
+    185a:	89 ca                	mov    edx,ecx
+    185c:	88 55 f4             	mov    BYTE PTR [rbp-0xc],dl
+    185f:	88 45 f0             	mov    BYTE PTR [rbp-0x10],al
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:48
+            _ready(ready), _suspend(suspend)
+    1862:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1866:	0f b6 55 f4          	movzx  edx,BYTE PTR [rbp-0xc]
+    186a:	88 10                	mov    BYTE PTR [rax],dl
+    186c:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1870:	0f b6 55 f0          	movzx  edx,BYTE PTR [rbp-0x10]
+    1874:	88 50 01             	mov    BYTE PTR [rax+0x1],dl
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:50
+            printf("Promise::Promise(); %p\n", (void*)this);
+    1877:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    187b:	48 89 c6             	mov    rsi,rax
+    187e:	48 8d 3d 23 09 00 00 	lea    rdi,[rip+0x923]        # 21a8 <AWAIT_NOT_SUSPEND+0x19d>
+    1885:	b8 00 00 00 00       	mov    eax,0x0
+    188a:	e8 a1 f7 ff ff       	call   1030 <printf@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:51
+        }
+    188f:	90                   	nop
+    1890:	c9                   	leave  
+    1891:	c3                   	ret    
+
+0000000000001892 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::get_return_object()>:
+Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::get_return_object():
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:62
+        Result get_return_object() noexcept {
+    1892:	55                   	push   rbp
+    1893:	48 89 e5             	mov    rbp,rsp
+    1896:	48 83 ec 10          	sub    rsp,0x10
+    189a:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    189e:	48 89 75 f0          	mov    QWORD PTR [rbp-0x10],rsi
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:63
+            printf("Promise::get_return_object()\n");
+    18a2:	48 8d 3d 17 09 00 00 	lea    rdi,[rip+0x917]        # 21c0 <AWAIT_NOT_SUSPEND+0x1b5>
+    18a9:	e8 d2 f7 ff ff       	call   1080 <puts@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:64
+            return *this;
+    18ae:	48 8b 55 f0          	mov    rdx,QWORD PTR [rbp-0x10]
+    18b2:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    18b6:	48 89 d6             	mov    rsi,rdx
+    18b9:	48 89 c7             	mov    rdi,rax
+    18bc:	e8 43 01 00 00       	call   1a04 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Result(Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise&)>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:65
+        }
+    18c1:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    18c5:	c9                   	leave  
+    18c6:	c3                   	ret    
+    18c7:	90                   	nop
+
+00000000000018c8 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::~Result()>:
+Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::~Result():
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:106
+    ~Result() {
+    18c8:	55                   	push   rbp
+    18c9:	48 89 e5             	mov    rbp,rsp
+    18cc:	48 83 ec 20          	sub    rsp,0x20
+    18d0:	48 89 7d e8          	mov    QWORD PTR [rbp-0x18],rdi
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:107
+        printf("Result::~Result(); %p\n", (void*)this);
+    18d4:	48 8b 45 e8          	mov    rax,QWORD PTR [rbp-0x18]
+    18d8:	48 89 c6             	mov    rsi,rax
+    18db:	48 8d 3d fb 08 00 00 	lea    rdi,[rip+0x8fb]        # 21dd <AWAIT_NOT_SUSPEND+0x1d2>
+    18e2:	b8 00 00 00 00       	mov    eax,0x0
+    18e7:	e8 44 f7 ff ff       	call   1030 <printf@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:108
+        Handle::from_promise(_promise).destroy();
+    18ec:	48 8b 45 e8          	mov    rax,QWORD PTR [rbp-0x18]
+    18f0:	48 8b 00             	mov    rax,QWORD PTR [rax]
+    18f3:	48 89 c7             	mov    rdi,rax
+    18f6:	e8 3f 01 00 00       	call   1a3a <std::__n4861::coroutine_handle<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::from_promise(Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise&)>
+    18fb:	48 89 45 f8          	mov    QWORD PTR [rbp-0x8],rax
+    18ff:	48 8d 45 f8          	lea    rax,[rbp-0x8]
+    1903:	48 89 c7             	mov    rdi,rax
+    1906:	e8 5d fd ff ff       	call   1668 <std::__n4861::coroutine_handle<void>::destroy() const>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:109
+    }
+    190b:	90                   	nop
+    190c:	c9                   	leave  
+    190d:	c3                   	ret    
+
+000000000000190e <std::__n4861::coroutine_handle<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::from_address(void*)>:
+std::__n4861::coroutine_handle<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::from_address(void*):
+/usr/include/c++/10/coroutine:200
+    constexpr static coroutine_handle from_address(void* __a)
+    190e:	55                   	push   rbp
+    190f:	48 89 e5             	mov    rbp,rsp
+    1912:	48 89 7d e8          	mov    QWORD PTR [rbp-0x18],rdi
+/usr/include/c++/10/coroutine:202
+      coroutine_handle __self;
+    1916:	48 c7 45 f8 00 00 00 	mov    QWORD PTR [rbp-0x8],0x0
+    191d:	00 
+/usr/include/c++/10/coroutine:203
+      __self._M_fr_ptr = __a;
+    191e:	48 8b 45 e8          	mov    rax,QWORD PTR [rbp-0x18]
+    1922:	48 89 45 f8          	mov    QWORD PTR [rbp-0x8],rax
+/usr/include/c++/10/coroutine:204
+      return __self;
+    1926:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+/usr/include/c++/10/coroutine:205
+    }
+    192a:	5d                   	pop    rbp
+    192b:	c3                   	ret    
+
+000000000000192c <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::~Promise()>:
+Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::~Promise():
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:53
+        ~Promise() noexcept {
+    192c:	55                   	push   rbp
+    192d:	48 89 e5             	mov    rbp,rsp
+    1930:	48 83 ec 10          	sub    rsp,0x10
+    1934:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:54
+            printf("Promise::~Promise(); %p\n", (void*)this);
+    1938:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    193c:	48 89 c6             	mov    rsi,rax
+    193f:	48 8d 3d ae 08 00 00 	lea    rdi,[rip+0x8ae]        # 21f4 <AWAIT_NOT_SUSPEND+0x1e9>
+    1946:	b8 00 00 00 00       	mov    eax,0x0
+    194b:	e8 e0 f6 ff ff       	call   1030 <printf@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:55
+        }
+    1950:	90                   	nop
+    1951:	c9                   	leave  
+    1952:	c3                   	ret    
+Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise::~Promise():
+    1953:	90                   	nop
+
+0000000000001954 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::done()>:
+Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::done():
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:117
+    bool done() {
+    1954:	55                   	push   rbp
+    1955:	48 89 e5             	mov    rbp,rsp
+    1958:	48 83 ec 20          	sub    rsp,0x20
+    195c:	48 89 7d e8          	mov    QWORD PTR [rbp-0x18],rdi
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:118
+        return Handle::from_promise(_promise).done();
+    1960:	48 8b 45 e8          	mov    rax,QWORD PTR [rbp-0x18]
+    1964:	48 8b 00             	mov    rax,QWORD PTR [rax]
+    1967:	48 89 c7             	mov    rdi,rax
+    196a:	e8 cb 00 00 00       	call   1a3a <std::__n4861::coroutine_handle<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::from_promise(Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise&)>
+    196f:	48 89 45 f8          	mov    QWORD PTR [rbp-0x8],rax
+    1973:	48 8d 45 f8          	lea    rax,[rbp-0x8]
+    1977:	48 89 c7             	mov    rdi,rax
+    197a:	e8 b1 fc ff ff       	call   1630 <std::__n4861::coroutine_handle<void>::done() const>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:119
+    }
+    197f:	c9                   	leave  
+    1980:	c3                   	ret    
+    1981:	90                   	nop
+
+0000000000001982 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::resume()>:
+Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::resume():
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:121
+    void resume() {
+    1982:	55                   	push   rbp
+    1983:	48 89 e5             	mov    rbp,rsp
+    1986:	48 83 ec 20          	sub    rsp,0x20
+    198a:	48 89 7d e8          	mov    QWORD PTR [rbp-0x18],rdi
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:122
+        Handle::from_promise(_promise).resume();
+    198e:	48 8b 45 e8          	mov    rax,QWORD PTR [rbp-0x18]
+    1992:	48 8b 00             	mov    rax,QWORD PTR [rax]
+    1995:	48 89 c7             	mov    rdi,rax
+    1998:	e8 9d 00 00 00       	call   1a3a <std::__n4861::coroutine_handle<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::from_promise(Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise&)>
+    199d:	48 89 45 f8          	mov    QWORD PTR [rbp-0x8],rax
+    19a1:	48 8d 45 f8          	lea    rax,[rbp-0x8]
+    19a5:	48 89 c7             	mov    rdi,rax
+    19a8:	e8 9d fc ff ff       	call   164a <std::__n4861::coroutine_handle<void>::resume() const>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:123
+    }
+    19ad:	90                   	nop
+    19ae:	c9                   	leave  
+    19af:	c3                   	ret    
+
+00000000000019b0 <Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::Awaitable(bool, bool, int)>:
+Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::Awaitable(bool, bool, int):
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:7
+    Awaitable(bool ready, bool suspend, int resume) noexcept:
+    19b0:	55                   	push   rbp
+    19b1:	48 89 e5             	mov    rbp,rsp
+    19b4:	48 83 ec 20          	sub    rsp,0x20
+    19b8:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    19bc:	89 d0                	mov    eax,edx
+    19be:	89 4d ec             	mov    DWORD PTR [rbp-0x14],ecx
+    19c1:	89 f2                	mov    edx,esi
+    19c3:	88 55 f4             	mov    BYTE PTR [rbp-0xc],dl
+    19c6:	88 45 f0             	mov    BYTE PTR [rbp-0x10],al
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:8
+        _ready(ready), _suspend(suspend), _resume(resume)
+    19c9:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    19cd:	0f b6 55 f4          	movzx  edx,BYTE PTR [rbp-0xc]
+    19d1:	88 10                	mov    BYTE PTR [rax],dl
+    19d3:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    19d7:	0f b6 55 f0          	movzx  edx,BYTE PTR [rbp-0x10]
+    19db:	88 50 01             	mov    BYTE PTR [rax+0x1],dl
+    19de:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    19e2:	8b 55 ec             	mov    edx,DWORD PTR [rbp-0x14]
+    19e5:	89 50 04             	mov    DWORD PTR [rax+0x4],edx
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:10
+        printf("Awaitable::Awaitable(); %p\n", (void*)this);
+    19e8:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    19ec:	48 89 c6             	mov    rsi,rax
+    19ef:	48 8d 3d 17 08 00 00 	lea    rdi,[rip+0x817]        # 220d <AWAIT_NOT_SUSPEND+0x202>
+    19f6:	b8 00 00 00 00       	mov    eax,0x0
+    19fb:	e8 30 f6 ff ff       	call   1030 <printf@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:11
+    }
+    1a00:	90                   	nop
+    1a01:	c9                   	leave  
+    1a02:	c3                   	ret    
+Awaitable<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::Awaitable(bool, bool, int):
+    1a03:	90                   	nop
+
+0000000000001a04 <Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Result(Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise&)>:
+Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Result(Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise&):
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:102
+    Result(Promise& promise) noexcept: _promise(promise) {
+    1a04:	55                   	push   rbp
+    1a05:	48 89 e5             	mov    rbp,rsp
+    1a08:	48 83 ec 10          	sub    rsp,0x10
+    1a0c:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    1a10:	48 89 75 f0          	mov    QWORD PTR [rbp-0x10],rsi
+    1a14:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1a18:	48 8b 55 f0          	mov    rdx,QWORD PTR [rbp-0x10]
+    1a1c:	48 89 10             	mov    QWORD PTR [rax],rdx
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:103
+        printf("Result::Result(); %p\n", (void*)this);
+    1a1f:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1a23:	48 89 c6             	mov    rsi,rax
+    1a26:	48 8d 3d fc 07 00 00 	lea    rdi,[rip+0x7fc]        # 2229 <AWAIT_NOT_SUSPEND+0x21e>
+    1a2d:	b8 00 00 00 00       	mov    eax,0x0
+    1a32:	e8 f9 f5 ff ff       	call   1030 <printf@plt>
+/home/ps/projects/c/cpp-playground/coroutines/disasm/main.cpp:104
+    }
+    1a37:	90                   	nop
+    1a38:	c9                   	leave  
+    1a39:	c3                   	ret    
+
+0000000000001a3a <std::__n4861::coroutine_handle<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::from_promise(Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise&)>:
+std::__n4861::coroutine_handle<Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise>::from_promise(Result<std::__n4861::suspend_always, std::__n4861::suspend_always>::Promise&):
+/usr/include/c++/10/coroutine:185
+      static coroutine_handle from_promise(_Promise& p)
+    1a3a:	55                   	push   rbp
+    1a3b:	48 89 e5             	mov    rbp,rsp
+    1a3e:	48 89 7d e8          	mov    QWORD PTR [rbp-0x18],rdi
+/usr/include/c++/10/coroutine:187
+	coroutine_handle __self;
+    1a42:	48 c7 45 f8 00 00 00 	mov    QWORD PTR [rbp-0x8],0x0
+    1a49:	00 
+/usr/include/c++/10/coroutine:189
+	  = __builtin_coro_promise((char*) &p, __alignof(_Promise), true);
+    1a4a:	48 8b 45 e8          	mov    rax,QWORD PTR [rbp-0x18]
+    1a4e:	48 83 e8 10          	sub    rax,0x10
+    1a52:	48 89 45 f8          	mov    QWORD PTR [rbp-0x8],rax
+/usr/include/c++/10/coroutine:190
+	return __self;
+    1a56:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+/usr/include/c++/10/coroutine:191
+      }
+    1a5a:	5d                   	pop    rbp
+    1a5b:	c3                   	ret    
+    1a5c:	0f 1f 40 00          	nop    DWORD PTR [rax+0x0]
+
+0000000000001a60 <__libc_csu_init>:
+__libc_csu_init():
+    1a60:	41 57                	push   r15
+    1a62:	4c 8d 3d 5f 23 00 00 	lea    r15,[rip+0x235f]        # 3dc8 <__frame_dummy_init_array_entry>
+    1a69:	41 56                	push   r14
+    1a6b:	49 89 d6             	mov    r14,rdx
+    1a6e:	41 55                	push   r13
+    1a70:	49 89 f5             	mov    r13,rsi
+    1a73:	41 54                	push   r12
+    1a75:	41 89 fc             	mov    r12d,edi
+    1a78:	55                   	push   rbp
+    1a79:	48 8d 2d 50 23 00 00 	lea    rbp,[rip+0x2350]        # 3dd0 <__do_global_dtors_aux_fini_array_entry>
+    1a80:	53                   	push   rbx
+    1a81:	4c 29 fd             	sub    rbp,r15
+    1a84:	48 83 ec 08          	sub    rsp,0x8
+    1a88:	e8 73 f5 ff ff       	call   1000 <_init>
+    1a8d:	48 c1 fd 03          	sar    rbp,0x3
+    1a91:	74 1b                	je     1aae <__libc_csu_init+0x4e>
+    1a93:	31 db                	xor    ebx,ebx
+    1a95:	0f 1f 00             	nop    DWORD PTR [rax]
+    1a98:	4c 89 f2             	mov    rdx,r14
+    1a9b:	4c 89 ee             	mov    rsi,r13
+    1a9e:	44 89 e7             	mov    edi,r12d
+    1aa1:	41 ff 14 df          	call   QWORD PTR [r15+rbx*8]
+    1aa5:	48 83 c3 01          	add    rbx,0x1
+    1aa9:	48 39 dd             	cmp    rbp,rbx
+    1aac:	75 ea                	jne    1a98 <__libc_csu_init+0x38>
+    1aae:	48 83 c4 08          	add    rsp,0x8
+    1ab2:	5b                   	pop    rbx
+    1ab3:	5d                   	pop    rbp
+    1ab4:	41 5c                	pop    r12
+    1ab6:	41 5d                	pop    r13
+    1ab8:	41 5e                	pop    r14
+    1aba:	41 5f                	pop    r15
+    1abc:	c3                   	ret    
+    1abd:	0f 1f 00             	nop    DWORD PTR [rax]
+
+0000000000001ac0 <__libc_csu_fini>:
+__libc_csu_fini():
+    1ac0:	c3                   	ret    
+
+Disassembly of section .fini:
+
+0000000000001ac4 <_fini>:
+_fini():
+    1ac4:	48 83 ec 08          	sub    rsp,0x8
+    1ac8:	48 83 c4 08          	add    rsp,0x8
+    1acc:	c3                   	ret    

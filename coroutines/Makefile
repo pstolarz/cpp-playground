@@ -1,7 +1,7 @@
 .PHONY: all clean
 
 CXX=gcc-10
-CXXFLAGS+=-Wall -g -fcoroutines --std=c++2a
+CXXFLAGS+=-Wall -fcoroutines --std=c++2a
 
 OBJS = \
        main \
