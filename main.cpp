@@ -31,7 +31,7 @@ ostream& operator<<(ostream& os, F B::*mp)
 #endif
        (!(sizeof(F B::*) % sizeof(void*)))
     {
-        // array of pointers
+        // array of pointers (see member_ptr test for clarification)
         _print_array<void*>(os,
             reinterpret_cast<void* (*)[sizeof(mp) / sizeof(void*)]>(&mp));
     } else {
