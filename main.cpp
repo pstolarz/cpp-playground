@@ -53,6 +53,7 @@ ostream& operator<<(ostream& os, F B::*mp)
 #include "function_alt.h"
 #include "tuple_alt.h"
 #include "bind_alt_c17.h"
+#include "align_c17.h"
 
 int main(void)
 {
@@ -82,6 +83,9 @@ int main(void)
 
     std::cout << "\n--------- bind_alt (C++17)"  << "\n";
     bind_alt_c17::test();
+
+    std::cout << "\n--------- align (C++17)"  << "\n";
+    align_c17::test();
 
     return 0;
 }

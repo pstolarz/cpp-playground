@@ -12,7 +12,8 @@ HEADERS = \
     meta_list.h \
     function_alt.h \
     tuple_alt.h \
-    bind_alt_c17.h
+    bind_alt_c17.h \
+    align_c17.h
 
 all: main
 

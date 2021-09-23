@@ -1,12 +1,12 @@
 #ifndef __BIND_ALT_C17__
 #define __BIND_ALT_C17__
 
+#include <cassert>
+#include <functional>
+
 namespace bind_alt_c17 {
 
 #if __cplusplus >= 201703L
-
-#include <cassert>
-#include <functional>
 
 struct A { int a; };
 
