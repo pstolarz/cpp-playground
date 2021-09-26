@@ -1,0 +1,619 @@
+
+main:     file format elf64-x86-64
+
+
+Disassembly of section .init:
+
+0000000000001000 <_init>:
+_init():
+    1000:	48 83 ec 08          	sub    rsp,0x8
+    1004:	48 8b 05 dd 2f 00 00 	mov    rax,QWORD PTR [rip+0x2fdd]        # 3fe8 <__gmon_start__@Base>
+    100b:	48 85 c0             	test   rax,rax
+    100e:	74 02                	je     1012 <_init+0x12>
+    1010:	ff d0                	call   rax
+    1012:	48 83 c4 08          	add    rsp,0x8
+    1016:	c3                   	ret    
+
+Disassembly of section .plt:
+
+0000000000001020 <std::ostream::operator<<(unsigned long)@plt-0x10>:
+    1020:	ff 35 e2 2f 00 00    	push   QWORD PTR [rip+0x2fe2]        # 4008 <_GLOBAL_OFFSET_TABLE_+0x8>
+    1026:	ff 25 e4 2f 00 00    	jmp    QWORD PTR [rip+0x2fe4]        # 4010 <_GLOBAL_OFFSET_TABLE_+0x10>
+    102c:	0f 1f 40 00          	nop    DWORD PTR [rax+0x0]
+
+0000000000001030 <std::ostream::operator<<(unsigned long)@plt>:
+    1030:	ff 25 e2 2f 00 00    	jmp    QWORD PTR [rip+0x2fe2]        # 4018 <std::ostream::operator<<(unsigned long)@GLIBCXX_3.4>
+    1036:	68 00 00 00 00       	push   0x0
+    103b:	e9 e0 ff ff ff       	jmp    1020 <_init+0x20>
+
+0000000000001040 <std::ostream::operator<<(void const*)@plt>:
+    1040:	ff 25 da 2f 00 00    	jmp    QWORD PTR [rip+0x2fda]        # 4020 <std::ostream::operator<<(void const*)@GLIBCXX_3.4>
+    1046:	68 01 00 00 00       	push   0x1
+    104b:	e9 d0 ff ff ff       	jmp    1020 <_init+0x20>
+
+0000000000001050 <__cxa_atexit@plt>:
+    1050:	ff 25 d2 2f 00 00    	jmp    QWORD PTR [rip+0x2fd2]        # 4028 <__cxa_atexit@GLIBC_2.2.5>
+    1056:	68 02 00 00 00       	push   0x2
+    105b:	e9 c0 ff ff ff       	jmp    1020 <_init+0x20>
+
+0000000000001060 <std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*)@plt>:
+    1060:	ff 25 ca 2f 00 00    	jmp    QWORD PTR [rip+0x2fca]        # 4030 <std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*)@GLIBCXX_3.4>
+    1066:	68 03 00 00 00       	push   0x3
+    106b:	e9 b0 ff ff ff       	jmp    1020 <_init+0x20>
+
+0000000000001070 <free@plt>:
+    1070:	ff 25 c2 2f 00 00    	jmp    QWORD PTR [rip+0x2fc2]        # 4038 <free@GLIBC_2.2.5>
+    1076:	68 04 00 00 00       	push   0x4
+    107b:	e9 a0 ff ff ff       	jmp    1020 <_init+0x20>
+
+0000000000001080 <malloc@plt>:
+    1080:	ff 25 ba 2f 00 00    	jmp    QWORD PTR [rip+0x2fba]        # 4040 <malloc@GLIBC_2.2.5>
+    1086:	68 05 00 00 00       	push   0x5
+    108b:	e9 90 ff ff ff       	jmp    1020 <_init+0x20>
+
+0000000000001090 <std::ios_base::Init::Init()@plt>:
+    1090:	ff 25 b2 2f 00 00    	jmp    QWORD PTR [rip+0x2fb2]        # 4048 <std::ios_base::Init::Init()@GLIBCXX_3.4>
+    1096:	68 06 00 00 00       	push   0x6
+    109b:	e9 80 ff ff ff       	jmp    1020 <_init+0x20>
+
+Disassembly of section .plt.got:
+
+00000000000010a0 <__cxa_finalize@plt>:
+    10a0:	ff 25 2a 2f 00 00    	jmp    QWORD PTR [rip+0x2f2a]        # 3fd0 <__cxa_finalize@GLIBC_2.2.5>
+    10a6:	66 90                	xchg   ax,ax
+
+Disassembly of section .text:
+
+00000000000010b0 <_start>:
+_start():
+    10b0:	31 ed                	xor    ebp,ebp
+    10b2:	49 89 d1             	mov    r9,rdx
+    10b5:	5e                   	pop    rsi
+    10b6:	48 89 e2             	mov    rdx,rsp
+    10b9:	48 83 e4 f0          	and    rsp,0xfffffffffffffff0
+    10bd:	50                   	push   rax
+    10be:	54                   	push   rsp
+    10bf:	4c 8d 05 8a 05 00 00 	lea    r8,[rip+0x58a]        # 1650 <__libc_csu_fini>
+    10c6:	48 8d 0d 23 05 00 00 	lea    rcx,[rip+0x523]        # 15f0 <__libc_csu_init>
+    10cd:	48 8d 3d c1 00 00 00 	lea    rdi,[rip+0xc1]        # 1195 <main>
+    10d4:	ff 15 06 2f 00 00    	call   QWORD PTR [rip+0x2f06]        # 3fe0 <__libc_start_main@GLIBC_2.2.5>
+    10da:	f4                   	hlt    
+    10db:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+00000000000010e0 <deregister_tm_clones>:
+deregister_tm_clones():
+    10e0:	48 8d 3d 81 2f 00 00 	lea    rdi,[rip+0x2f81]        # 4068 <__TMC_END__>
+    10e7:	48 8d 05 7a 2f 00 00 	lea    rax,[rip+0x2f7a]        # 4068 <__TMC_END__>
+    10ee:	48 39 f8             	cmp    rax,rdi
+    10f1:	74 15                	je     1108 <deregister_tm_clones+0x28>
+    10f3:	48 8b 05 de 2e 00 00 	mov    rax,QWORD PTR [rip+0x2ede]        # 3fd8 <_ITM_deregisterTMCloneTable@Base>
+    10fa:	48 85 c0             	test   rax,rax
+    10fd:	74 09                	je     1108 <deregister_tm_clones+0x28>
+    10ff:	ff e0                	jmp    rax
+    1101:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+    1108:	c3                   	ret    
+    1109:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+
+0000000000001110 <register_tm_clones>:
+register_tm_clones():
+    1110:	48 8d 3d 51 2f 00 00 	lea    rdi,[rip+0x2f51]        # 4068 <__TMC_END__>
+    1117:	48 8d 35 4a 2f 00 00 	lea    rsi,[rip+0x2f4a]        # 4068 <__TMC_END__>
+    111e:	48 29 fe             	sub    rsi,rdi
+    1121:	48 89 f0             	mov    rax,rsi
+    1124:	48 c1 ee 3f          	shr    rsi,0x3f
+    1128:	48 c1 f8 03          	sar    rax,0x3
+    112c:	48 01 c6             	add    rsi,rax
+    112f:	48 d1 fe             	sar    rsi,1
+    1132:	74 14                	je     1148 <register_tm_clones+0x38>
+    1134:	48 8b 05 b5 2e 00 00 	mov    rax,QWORD PTR [rip+0x2eb5]        # 3ff0 <_ITM_registerTMCloneTable@Base>
+    113b:	48 85 c0             	test   rax,rax
+    113e:	74 08                	je     1148 <register_tm_clones+0x38>
+    1140:	ff e0                	jmp    rax
+    1142:	66 0f 1f 44 00 00    	nop    WORD PTR [rax+rax*1+0x0]
+    1148:	c3                   	ret    
+    1149:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+
+0000000000001150 <__do_global_dtors_aux>:
+__do_global_dtors_aux():
+    1150:	80 3d 39 30 00 00 00 	cmp    BYTE PTR [rip+0x3039],0x0        # 4190 <completed.0>
+    1157:	75 2f                	jne    1188 <__do_global_dtors_aux+0x38>
+    1159:	55                   	push   rbp
+    115a:	48 83 3d 6e 2e 00 00 	cmp    QWORD PTR [rip+0x2e6e],0x0        # 3fd0 <__cxa_finalize@GLIBC_2.2.5>
+    1161:	00 
+    1162:	48 89 e5             	mov    rbp,rsp
+    1165:	74 0c                	je     1173 <__do_global_dtors_aux+0x23>
+    1167:	48 8b 3d ea 2e 00 00 	mov    rdi,QWORD PTR [rip+0x2eea]        # 4058 <__dso_handle>
+    116e:	e8 2d ff ff ff       	call   10a0 <__cxa_finalize@plt>
+    1173:	e8 68 ff ff ff       	call   10e0 <deregister_tm_clones>
+    1178:	c6 05 11 30 00 00 01 	mov    BYTE PTR [rip+0x3011],0x1        # 4190 <completed.0>
+    117f:	5d                   	pop    rbp
+    1180:	c3                   	ret    
+    1181:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+    1188:	c3                   	ret    
+    1189:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+
+0000000000001190 <frame_dummy>:
+frame_dummy():
+    1190:	e9 7b ff ff ff       	jmp    1110 <register_tm_clones>
+
+0000000000001195 <main>:
+main():
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:57
+
+    virtual ~B() { std::cout << "~B()\n"; }
+};
+
+int main()
+{
+    1195:	55                   	push   rbp
+    1196:	48 89 e5             	mov    rbp,rsp
+    1199:	53                   	push   rbx
+    119a:	48 83 ec 48          	sub    rsp,0x48
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:59
+    {
+        B b = B{};
+    119e:	48 c7 45 b0 00 00 00 	mov    QWORD PTR [rbp-0x50],0x0
+    11a5:	00 
+    11a6:	c7 45 b8 00 00 00 00 	mov    DWORD PTR [rbp-0x48],0x0
+    11ad:	48 c7 45 c0 00 00 00 	mov    QWORD PTR [rbp-0x40],0x0
+    11b4:	00 
+    11b5:	c7 45 c8 00 00 00 00 	mov    DWORD PTR [rbp-0x38],0x0
+    11bc:	c7 45 cc 00 00 00 00 	mov    DWORD PTR [rbp-0x34],0x0
+    11c3:	48 8d 45 b0          	lea    rax,[rbp-0x50]
+    11c7:	48 89 c7             	mov    rdi,rax
+    11ca:	e8 cd 03 00 00       	call   159c <B::B()>
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:60
+        A *pa = &b;
+    11cf:	48 8d 45 b0          	lea    rax,[rbp-0x50]
+    11d3:	48 83 c0 10          	add    rax,0x10
+    11d7:	48 89 45 e8          	mov    QWORD PTR [rbp-0x18],rax
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:61
+        pa->~A();       // virtually calls ~B()<main>
+    11db:	48 8b 45 e8          	mov    rax,QWORD PTR [rbp-0x18]
+    11df:	48 8b 00             	mov    rax,QWORD PTR [rax]
+    11e2:	48 8b 10             	mov    rdx,QWORD PTR [rax]
+    11e5:	48 8b 45 e8          	mov    rax,QWORD PTR [rbp-0x18]
+    11e9:	48 89 c7             	mov    rdi,rax
+    11ec:	ff d2                	call   rdx
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:62
+        pa->A::~A();    // directly calls ~A()<main>
+    11ee:	48 8b 45 e8          	mov    rax,QWORD PTR [rbp-0x18]
+    11f2:	48 89 c7             	mov    rdi,rax
+    11f5:	e8 0e 02 00 00       	call   1408 <A::~A()>
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:59
+        B b = B{};
+    11fa:	48 8d 45 b0          	lea    rax,[rbp-0x50]
+    11fe:	48 89 c7             	mov    rdi,rax
+    1201:	e8 ba 02 00 00       	call   14c0 <B::~B()>
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:65
+    }                   // directly calls ~B <main>
+
+    std::cout << "\n";
+    1206:	48 8d 35 30 0e 00 00 	lea    rsi,[rip+0xe30]        # 203d <std::piecewise_construct+0x39>
+    120d:	48 8d 3d 6c 2e 00 00 	lea    rdi,[rip+0x2e6c]        # 4080 <std::cout@@GLIBCXX_3.4>
+    1214:	e8 47 fe ff ff       	call   1060 <std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*)@plt>
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:68
+
+    {
+        B *b = new B{};
+    1219:	bf 20 00 00 00       	mov    edi,0x20
+    121e:	e8 23 01 00 00       	call   1346 <operator new(unsigned long)>
+    1223:	48 89 c3             	mov    rbx,rax
+    1226:	48 c7 03 00 00 00 00 	mov    QWORD PTR [rbx],0x0
+    122d:	c7 43 08 00 00 00 00 	mov    DWORD PTR [rbx+0x8],0x0
+    1234:	48 c7 43 10 00 00 00 	mov    QWORD PTR [rbx+0x10],0x0
+    123b:	00 
+    123c:	c7 43 18 00 00 00 00 	mov    DWORD PTR [rbx+0x18],0x0
+    1243:	c7 43 1c 00 00 00 00 	mov    DWORD PTR [rbx+0x1c],0x0
+    124a:	48 89 df             	mov    rdi,rbx
+    124d:	e8 4a 03 00 00       	call   159c <B::B()>
+    1252:	48 89 5d e0          	mov    QWORD PTR [rbp-0x20],rbx
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:69
+        A *a = b;
+    1256:	48 83 7d e0 00       	cmp    QWORD PTR [rbp-0x20],0x0
+    125b:	74 0a                	je     1267 <main+0xd2>
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:69 (discriminator 1)
+    125d:	48 8b 45 e0          	mov    rax,QWORD PTR [rbp-0x20]
+    1261:	48 83 c0 10          	add    rax,0x10
+    1265:	eb 05                	jmp    126c <main+0xd7>
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:69 (discriminator 2)
+    1267:	b8 00 00 00 00       	mov    eax,0x0
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:69 (discriminator 4)
+    126c:	48 89 45 d8          	mov    QWORD PTR [rbp-0x28],rax
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:70 (discriminator 4)
+        std::cout << "a: " << a << ", b: " << b << "\n";
+    1270:	48 8d 35 c8 0d 00 00 	lea    rsi,[rip+0xdc8]        # 203f <std::piecewise_construct+0x3b>
+    1277:	48 8d 3d 02 2e 00 00 	lea    rdi,[rip+0x2e02]        # 4080 <std::cout@@GLIBCXX_3.4>
+    127e:	e8 dd fd ff ff       	call   1060 <std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*)@plt>
+    1283:	48 89 c2             	mov    rdx,rax
+    1286:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    128a:	48 89 c6             	mov    rsi,rax
+    128d:	48 89 d7             	mov    rdi,rdx
+    1290:	e8 ab fd ff ff       	call   1040 <std::ostream::operator<<(void const*)@plt>
+    1295:	48 8d 35 a7 0d 00 00 	lea    rsi,[rip+0xda7]        # 2043 <std::piecewise_construct+0x3f>
+    129c:	48 89 c7             	mov    rdi,rax
+    129f:	e8 bc fd ff ff       	call   1060 <std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*)@plt>
+    12a4:	48 89 c2             	mov    rdx,rax
+    12a7:	48 8b 45 e0          	mov    rax,QWORD PTR [rbp-0x20]
+    12ab:	48 89 c6             	mov    rsi,rax
+    12ae:	48 89 d7             	mov    rdi,rdx
+    12b1:	e8 8a fd ff ff       	call   1040 <std::ostream::operator<<(void const*)@plt>
+    12b6:	48 8d 35 80 0d 00 00 	lea    rsi,[rip+0xd80]        # 203d <std::piecewise_construct+0x39>
+    12bd:	48 89 c7             	mov    rdi,rax
+    12c0:	e8 9b fd ff ff       	call   1060 <std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*)@plt>
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:71 (discriminator 4)
+        delete a;       // virtually calls ~B<delete>
+    12c5:	48 8b 45 d8          	mov    rax,QWORD PTR [rbp-0x28]
+    12c9:	48 85 c0             	test   rax,rax
+    12cc:	74 0f                	je     12dd <main+0x148>
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:71 (discriminator 1)
+    12ce:	48 8b 10             	mov    rdx,QWORD PTR [rax]
+    12d1:	48 83 c2 08          	add    rdx,0x8
+    12d5:	48 8b 12             	mov    rdx,QWORD PTR [rdx]
+    12d8:	48 89 c7             	mov    rdi,rax
+    12db:	ff d2                	call   rdx
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:74
+    }
+
+    return 0;
+    12dd:	b8 00 00 00 00       	mov    eax,0x0
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:75
+}
+    12e2:	48 8b 5d f8          	mov    rbx,QWORD PTR [rbp-0x8]
+    12e6:	c9                   	leave  
+    12e7:	c3                   	ret    
+
+00000000000012e8 <__static_initialization_and_destruction_0(int, int)>:
+__static_initialization_and_destruction_0(int, int):
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:75
+    12e8:	55                   	push   rbp
+    12e9:	48 89 e5             	mov    rbp,rsp
+    12ec:	48 83 ec 10          	sub    rsp,0x10
+    12f0:	89 7d fc             	mov    DWORD PTR [rbp-0x4],edi
+    12f3:	89 75 f8             	mov    DWORD PTR [rbp-0x8],esi
+    12f6:	83 7d fc 01          	cmp    DWORD PTR [rbp-0x4],0x1
+    12fa:	75 32                	jne    132e <__static_initialization_and_destruction_0(int, int)+0x46>
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:75 (discriminator 1)
+    12fc:	81 7d f8 ff ff 00 00 	cmp    DWORD PTR [rbp-0x8],0xffff
+    1303:	75 29                	jne    132e <__static_initialization_and_destruction_0(int, int)+0x46>
+/usr/include/c++/10/iostream:74
+  extern wostream wclog;	/// Linked to standard error (buffered)
+#endif
+  ///@}
+
+  // For construction of filebuffers for cout, cin, cerr, clog et. al.
+  static ios_base::Init __ioinit;
+    1305:	48 8d 3d 85 2e 00 00 	lea    rdi,[rip+0x2e85]        # 4191 <std::__ioinit>
+    130c:	e8 7f fd ff ff       	call   1090 <std::ios_base::Init::Init()@plt>
+    1311:	48 8d 15 40 2d 00 00 	lea    rdx,[rip+0x2d40]        # 4058 <__dso_handle>
+    1318:	48 8d 35 72 2e 00 00 	lea    rsi,[rip+0x2e72]        # 4191 <std::__ioinit>
+    131f:	48 8b 05 d2 2c 00 00 	mov    rax,QWORD PTR [rip+0x2cd2]        # 3ff8 <std::ios_base::Init::~Init()@GLIBCXX_3.4>
+    1326:	48 89 c7             	mov    rdi,rax
+    1329:	e8 22 fd ff ff       	call   1050 <__cxa_atexit@plt>
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:75
+    132e:	90                   	nop
+    132f:	c9                   	leave  
+    1330:	c3                   	ret    
+
+0000000000001331 <_GLOBAL__sub_I_main>:
+_GLOBAL__sub_I_main():
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:75
+    1331:	55                   	push   rbp
+    1332:	48 89 e5             	mov    rbp,rsp
+    1335:	be ff ff 00 00       	mov    esi,0xffff
+    133a:	bf 01 00 00 00       	mov    edi,0x1
+    133f:	e8 a4 ff ff ff       	call   12e8 <__static_initialization_and_destruction_0(int, int)>
+    1344:	5d                   	pop    rbp
+    1345:	c3                   	ret    
+
+0000000000001346 <operator new(unsigned long)>:
+operator new(unsigned long):
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:21
+inline void *operator new(size_t sz) {
+    1346:	55                   	push   rbp
+    1347:	48 89 e5             	mov    rbp,rsp
+    134a:	48 83 ec 10          	sub    rsp,0x10
+    134e:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:22
+    std::cout << "operator new(" << sz << ")\n";
+    1352:	48 8d 35 ac 0c 00 00 	lea    rsi,[rip+0xcac]        # 2005 <std::piecewise_construct+0x1>
+    1359:	48 8d 3d 20 2d 00 00 	lea    rdi,[rip+0x2d20]        # 4080 <std::cout@@GLIBCXX_3.4>
+    1360:	e8 fb fc ff ff       	call   1060 <std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*)@plt>
+    1365:	48 89 c2             	mov    rdx,rax
+    1368:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    136c:	48 89 c6             	mov    rsi,rax
+    136f:	48 89 d7             	mov    rdi,rdx
+    1372:	e8 b9 fc ff ff       	call   1030 <std::ostream::operator<<(unsigned long)@plt>
+    1377:	48 8d 35 95 0c 00 00 	lea    rsi,[rip+0xc95]        # 2013 <std::piecewise_construct+0xf>
+    137e:	48 89 c7             	mov    rdi,rax
+    1381:	e8 da fc ff ff       	call   1060 <std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*)@plt>
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:23
+    return malloc(sz);
+    1386:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    138a:	48 89 c7             	mov    rdi,rax
+    138d:	e8 ee fc ff ff       	call   1080 <malloc@plt>
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:24
+}
+    1392:	c9                   	leave  
+    1393:	c3                   	ret    
+
+0000000000001394 <operator delete(void*, unsigned long)>:
+operator delete(void*, unsigned long):
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:32
+inline void operator delete(void* ptr, size_t sz) NOEXCEPT {
+    1394:	55                   	push   rbp
+    1395:	48 89 e5             	mov    rbp,rsp
+    1398:	48 83 ec 10          	sub    rsp,0x10
+    139c:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    13a0:	48 89 75 f0          	mov    QWORD PTR [rbp-0x10],rsi
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:33
+    std::cout << "operator delete(" << ptr << ", " << sz << ")\n";
+    13a4:	48 8d 35 6b 0c 00 00 	lea    rsi,[rip+0xc6b]        # 2016 <std::piecewise_construct+0x12>
+    13ab:	48 8d 3d ce 2c 00 00 	lea    rdi,[rip+0x2cce]        # 4080 <std::cout@@GLIBCXX_3.4>
+    13b2:	e8 a9 fc ff ff       	call   1060 <std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*)@plt>
+    13b7:	48 89 c2             	mov    rdx,rax
+    13ba:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    13be:	48 89 c6             	mov    rsi,rax
+    13c1:	48 89 d7             	mov    rdi,rdx
+    13c4:	e8 77 fc ff ff       	call   1040 <std::ostream::operator<<(void const*)@plt>
+    13c9:	48 8d 35 57 0c 00 00 	lea    rsi,[rip+0xc57]        # 2027 <std::piecewise_construct+0x23>
+    13d0:	48 89 c7             	mov    rdi,rax
+    13d3:	e8 88 fc ff ff       	call   1060 <std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*)@plt>
+    13d8:	48 89 c2             	mov    rdx,rax
+    13db:	48 8b 45 f0          	mov    rax,QWORD PTR [rbp-0x10]
+    13df:	48 89 c6             	mov    rsi,rax
+    13e2:	48 89 d7             	mov    rdi,rdx
+    13e5:	e8 46 fc ff ff       	call   1030 <std::ostream::operator<<(unsigned long)@plt>
+    13ea:	48 8d 35 22 0c 00 00 	lea    rsi,[rip+0xc22]        # 2013 <std::piecewise_construct+0xf>
+    13f1:	48 89 c7             	mov    rdi,rax
+    13f4:	e8 67 fc ff ff       	call   1060 <std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*)@plt>
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:34
+    free(ptr);
+    13f9:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    13fd:	48 89 c7             	mov    rdi,rax
+    1400:	e8 6b fc ff ff       	call   1070 <free@plt>
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:35
+}
+    1405:	90                   	nop
+    1406:	c9                   	leave  
+    1407:	c3                   	ret    
+
+0000000000001408 <A::~A()>:
+A::~A():
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:41
+    virtual ~A() { std::cout << "~A()\n"; }
+    1408:	55                   	push   rbp
+    1409:	48 89 e5             	mov    rbp,rsp
+    140c:	48 83 ec 10          	sub    rsp,0x10
+    1410:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    1414:	48 8d 15 5d 29 00 00 	lea    rdx,[rip+0x295d]        # 3d78 <vtable for A+0x10>
+    141b:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    141f:	48 89 10             	mov    QWORD PTR [rax],rdx
+    1422:	48 8d 35 01 0c 00 00 	lea    rsi,[rip+0xc01]        # 202a <std::piecewise_construct+0x26>
+    1429:	48 8d 3d 50 2c 00 00 	lea    rdi,[rip+0x2c50]        # 4080 <std::cout@@GLIBCXX_3.4>
+    1430:	e8 2b fc ff ff       	call   1060 <std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*)@plt>
+    1435:	90                   	nop
+    1436:	c9                   	leave  
+    1437:	c3                   	ret    
+
+0000000000001438 <A::~A()>:
+A::~A():
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:41
+    1438:	55                   	push   rbp
+    1439:	48 89 e5             	mov    rbp,rsp
+    143c:	48 83 ec 10          	sub    rsp,0x10
+    1440:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    1444:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1448:	48 89 c7             	mov    rdi,rax
+    144b:	e8 b8 ff ff ff       	call   1408 <A::~A()>
+    1450:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1454:	be 10 00 00 00       	mov    esi,0x10
+    1459:	48 89 c7             	mov    rdi,rax
+    145c:	e8 33 ff ff ff       	call   1394 <operator delete(void*, unsigned long)>
+    1461:	c9                   	leave  
+    1462:	c3                   	ret    
+    1463:	90                   	nop
+
+0000000000001464 <A2::~A2()>:
+A2::~A2():
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:47
+    virtual ~A2() { std::cout << "~A2()\n"; }
+    1464:	55                   	push   rbp
+    1465:	48 89 e5             	mov    rbp,rsp
+    1468:	48 83 ec 10          	sub    rsp,0x10
+    146c:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    1470:	48 8d 15 e1 28 00 00 	lea    rdx,[rip+0x28e1]        # 3d58 <vtable for A2+0x10>
+    1477:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    147b:	48 89 10             	mov    QWORD PTR [rax],rdx
+    147e:	48 8d 35 ab 0b 00 00 	lea    rsi,[rip+0xbab]        # 2030 <std::piecewise_construct+0x2c>
+    1485:	48 8d 3d f4 2b 00 00 	lea    rdi,[rip+0x2bf4]        # 4080 <std::cout@@GLIBCXX_3.4>
+    148c:	e8 cf fb ff ff       	call   1060 <std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*)@plt>
+    1491:	90                   	nop
+    1492:	c9                   	leave  
+    1493:	c3                   	ret    
+
+0000000000001494 <A2::~A2()>:
+A2::~A2():
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:47
+    1494:	55                   	push   rbp
+    1495:	48 89 e5             	mov    rbp,rsp
+    1498:	48 83 ec 10          	sub    rsp,0x10
+    149c:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    14a0:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    14a4:	48 89 c7             	mov    rdi,rax
+    14a7:	e8 b8 ff ff ff       	call   1464 <A2::~A2()>
+    14ac:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    14b0:	be 10 00 00 00       	mov    esi,0x10
+    14b5:	48 89 c7             	mov    rdi,rax
+    14b8:	e8 d7 fe ff ff       	call   1394 <operator delete(void*, unsigned long)>
+    14bd:	c9                   	leave  
+    14be:	c3                   	ret    
+    14bf:	90                   	nop
+
+00000000000014c0 <B::~B()>:
+B::~B():
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:53
+    virtual ~B() { std::cout << "~B()\n"; }
+    14c0:	55                   	push   rbp
+    14c1:	48 89 e5             	mov    rbp,rsp
+    14c4:	48 83 ec 10          	sub    rsp,0x10
+    14c8:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    14cc:	48 8d 15 45 28 00 00 	lea    rdx,[rip+0x2845]        # 3d18 <vtable for B+0x10>
+    14d3:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    14d7:	48 89 10             	mov    QWORD PTR [rax],rdx
+    14da:	48 8d 15 57 28 00 00 	lea    rdx,[rip+0x2857]        # 3d38 <vtable for B+0x30>
+    14e1:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    14e5:	48 89 50 10          	mov    QWORD PTR [rax+0x10],rdx
+    14e9:	48 8d 35 47 0b 00 00 	lea    rsi,[rip+0xb47]        # 2037 <std::piecewise_construct+0x33>
+    14f0:	48 8d 3d 89 2b 00 00 	lea    rdi,[rip+0x2b89]        # 4080 <std::cout@@GLIBCXX_3.4>
+    14f7:	e8 64 fb ff ff       	call   1060 <std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*)@plt>
+    14fc:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1500:	48 83 c0 10          	add    rax,0x10
+    1504:	48 89 c7             	mov    rdi,rax
+    1507:	e8 fc fe ff ff       	call   1408 <A::~A()>
+    150c:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1510:	48 89 c7             	mov    rdi,rax
+    1513:	e8 4c ff ff ff       	call   1464 <A2::~A2()>
+    1518:	90                   	nop
+    1519:	c9                   	leave  
+    151a:	c3                   	ret    
+
+000000000000151b <non-virtual thunk to B::~B()>:
+non-virtual thunk to B::~B():
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:53
+    151b:	48 83 ef 10          	sub    rdi,0x10
+    151f:	eb 9f                	jmp    14c0 <B::~B()>
+    1521:	90                   	nop
+
+0000000000001522 <B::~B()>:
+B::~B():
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:53
+    1522:	55                   	push   rbp
+    1523:	48 89 e5             	mov    rbp,rsp
+    1526:	48 83 ec 10          	sub    rsp,0x10
+    152a:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    152e:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1532:	48 89 c7             	mov    rdi,rax
+    1535:	e8 86 ff ff ff       	call   14c0 <B::~B()>
+    153a:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    153e:	be 20 00 00 00       	mov    esi,0x20
+    1543:	48 89 c7             	mov    rdi,rax
+    1546:	e8 49 fe ff ff       	call   1394 <operator delete(void*, unsigned long)>
+    154b:	c9                   	leave  
+    154c:	c3                   	ret    
+
+000000000000154d <non-virtual thunk to B::~B()>:
+non-virtual thunk to B::~B():
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:53
+    154d:	48 83 ef 10          	sub    rdi,0x10
+    1551:	eb cf                	jmp    1522 <B::~B()>
+    1553:	90                   	nop
+
+0000000000001554 <A2::A2()>:
+A2::A2():
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:44
+struct A2 {
+    1554:	55                   	push   rbp
+    1555:	48 89 e5             	mov    rbp,rsp
+    1558:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    155c:	48 8d 15 f5 27 00 00 	lea    rdx,[rip+0x27f5]        # 3d58 <vtable for A2+0x10>
+    1563:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1567:	48 89 10             	mov    QWORD PTR [rax],rdx
+    156a:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    156e:	c7 40 08 00 00 00 00 	mov    DWORD PTR [rax+0x8],0x0
+    1575:	90                   	nop
+    1576:	5d                   	pop    rbp
+    1577:	c3                   	ret    
+
+0000000000001578 <A::A()>:
+A::A():
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:38
+struct A {
+    1578:	55                   	push   rbp
+    1579:	48 89 e5             	mov    rbp,rsp
+    157c:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    1580:	48 8d 15 f1 27 00 00 	lea    rdx,[rip+0x27f1]        # 3d78 <vtable for A+0x10>
+    1587:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    158b:	48 89 10             	mov    QWORD PTR [rax],rdx
+    158e:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    1592:	c7 40 08 00 00 00 00 	mov    DWORD PTR [rax+0x8],0x0
+    1599:	90                   	nop
+    159a:	5d                   	pop    rbp
+    159b:	c3                   	ret    
+
+000000000000159c <B::B()>:
+B::B():
+/home/ps/projects/c/cpp-playground/virt_delete/main.cpp:50
+struct B: A2, A {
+    159c:	55                   	push   rbp
+    159d:	48 89 e5             	mov    rbp,rsp
+    15a0:	48 83 ec 10          	sub    rsp,0x10
+    15a4:	48 89 7d f8          	mov    QWORD PTR [rbp-0x8],rdi
+    15a8:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    15ac:	48 89 c7             	mov    rdi,rax
+    15af:	e8 a0 ff ff ff       	call   1554 <A2::A2()>
+    15b4:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    15b8:	48 83 c0 10          	add    rax,0x10
+    15bc:	48 89 c7             	mov    rdi,rax
+    15bf:	e8 b4 ff ff ff       	call   1578 <A::A()>
+    15c4:	48 8d 15 4d 27 00 00 	lea    rdx,[rip+0x274d]        # 3d18 <vtable for B+0x10>
+    15cb:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    15cf:	48 89 10             	mov    QWORD PTR [rax],rdx
+    15d2:	48 8d 15 5f 27 00 00 	lea    rdx,[rip+0x275f]        # 3d38 <vtable for B+0x30>
+    15d9:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    15dd:	48 89 50 10          	mov    QWORD PTR [rax+0x10],rdx
+    15e1:	48 8b 45 f8          	mov    rax,QWORD PTR [rbp-0x8]
+    15e5:	c7 40 1c 01 00 00 00 	mov    DWORD PTR [rax+0x1c],0x1
+    15ec:	90                   	nop
+    15ed:	c9                   	leave  
+    15ee:	c3                   	ret    
+    15ef:	90                   	nop
+
+00000000000015f0 <__libc_csu_init>:
+__libc_csu_init():
+    15f0:	41 57                	push   r15
+    15f2:	4c 8d 3d f7 26 00 00 	lea    r15,[rip+0x26f7]        # 3cf0 <__frame_dummy_init_array_entry>
+    15f9:	41 56                	push   r14
+    15fb:	49 89 d6             	mov    r14,rdx
+    15fe:	41 55                	push   r13
+    1600:	49 89 f5             	mov    r13,rsi
+    1603:	41 54                	push   r12
+    1605:	41 89 fc             	mov    r12d,edi
+    1608:	55                   	push   rbp
+    1609:	48 8d 2d f0 26 00 00 	lea    rbp,[rip+0x26f0]        # 3d00 <__do_global_dtors_aux_fini_array_entry>
+    1610:	53                   	push   rbx
+    1611:	4c 29 fd             	sub    rbp,r15
+    1614:	48 83 ec 08          	sub    rsp,0x8
+    1618:	e8 e3 f9 ff ff       	call   1000 <_init>
+    161d:	48 c1 fd 03          	sar    rbp,0x3
+    1621:	74 1b                	je     163e <__libc_csu_init+0x4e>
+    1623:	31 db                	xor    ebx,ebx
+    1625:	0f 1f 00             	nop    DWORD PTR [rax]
+    1628:	4c 89 f2             	mov    rdx,r14
+    162b:	4c 89 ee             	mov    rsi,r13
+    162e:	44 89 e7             	mov    edi,r12d
+    1631:	41 ff 14 df          	call   QWORD PTR [r15+rbx*8]
+    1635:	48 83 c3 01          	add    rbx,0x1
+    1639:	48 39 dd             	cmp    rbp,rbx
+    163c:	75 ea                	jne    1628 <__libc_csu_init+0x38>
+    163e:	48 83 c4 08          	add    rsp,0x8
+    1642:	5b                   	pop    rbx
+    1643:	5d                   	pop    rbp
+    1644:	41 5c                	pop    r12
+    1646:	41 5d                	pop    r13
+    1648:	41 5e                	pop    r14
+    164a:	41 5f                	pop    r15
+    164c:	c3                   	ret    
+    164d:	0f 1f 00             	nop    DWORD PTR [rax]
+
+0000000000001650 <__libc_csu_fini>:
+__libc_csu_fini():
+    1650:	c3                   	ret    
+
+Disassembly of section .fini:
+
+0000000000001654 <_fini>:
+_fini():
+    1654:	48 83 ec 08          	sub    rsp,0x8
+    1658:	48 83 c4 08          	add    rsp,0x8
+    165c:	c3                   	ret    
