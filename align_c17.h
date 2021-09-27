@@ -79,6 +79,8 @@ void test()
     ALGN_INFO(uint16_t);
     ALGN_INFO(uint32_t);
     ALGN_INFO(uint64_t);
+    ALGN_INFO(void*);
+    ALGN_INFO(size_t);
     ALGN_INFO(std::max_align_t);
     ALGN_INFO(s256_t);
 
@@ -88,6 +90,8 @@ void test()
     MALLOC_TEST(uint16_t);
     MALLOC_TEST(uint32_t);
     MALLOC_TEST(uint64_t);
+    MALLOC_TEST(void*);
+    MALLOC_TEST(size_t);
     MALLOC_TEST(std::max_align_t);
     MALLOC_TEST(s256_t);
 
@@ -97,6 +101,8 @@ void test()
     NEW_TEST(uint16_t);
     NEW_TEST(uint32_t);
     NEW_TEST(uint64_t);
+    NEW_TEST(void*);
+    NEW_TEST(size_t);
     NEW_TEST(std::max_align_t);
     NEW_TEST(s256_t);
 }
