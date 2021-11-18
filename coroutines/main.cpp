@@ -5,6 +5,11 @@
 #include <set>
 #include <stdexcept>
 
+// final_suspend() has been changed to noexcept for recent versions of
+// gcc therefore this part of test can lead to compilation errors for
+// newer compilers.
+//#define FINAL_EXCEPT_TEST
+
 namespace std {
 
 /*
@@ -176,19 +181,21 @@ struct Result
         }
 
         FinalSuspend final_suspend() const
+#ifndef FINAL_EXCEPT_TEST
+            noexcept
+#endif
         {
             std::cout << "Promise::final_suspend()\n";
 
+#ifdef FINAL_EXCEPT_TEST
             if (_rexcept == RaiseExcept::EXCEPT_FINAL)
                 throw std::runtime_error("final_suspend() exception");
-
+#endif
             return {};
         }
 
-        void return_void() const noexcept {
-            std::cout << "Promise::return_void()\n";
-        }
-
+        // NOTE: recent gcc versions do not allow coroutine to
+        // support return_void() and return_value() simultaneously
         void return_value(int ret_code) noexcept {
             std::cout << "Promise::return_value()\n";
 
@@ -209,7 +216,7 @@ struct Result
         RaiseExcept _rexcept;
         std::set<Result*> _results;
 
-        friend struct Result;
+    friend struct Result;
     };
 
     using promise_type = Promise;
@@ -276,7 +283,6 @@ private:
     int _yield_code;
 
 };
-
 
 constexpr const bool AWAIT_READY       = true;
 constexpr const bool AWAIT_NOT_READY   = false;
@@ -418,11 +424,14 @@ int main(void)
 
     // exception tests
     //
-    // BUG in gcc-10: while raising exception on any stage of coroutine life
+    // 1. BUG in gcc-10: while raising exception on any stage of coroutine life
     // (e.g. initial/final suspend, coroutine body) the coroutine frame is not
     // freed and the stack with coroutine result object is not unwinded:
-    //
     // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=95615
+    //
+    // 2. gcc-11 seems to provide other bug in this context by double-freeing
+    // a promise object while an exception is raised.
+#if 0
     {
         std::cout << "\n--- exception in coroutine body\n";
         try {
@@ -441,6 +450,7 @@ int main(void)
         }
     }
 
+#ifdef FINAL_EXCEPT_TEST
     {
         std::cout << "\n--- exception in final_suspend()\n";
         try {
@@ -449,6 +459,7 @@ int main(void)
             std::cout << "Exception: " << e.what() << "\n";
         }
     }
-
+#endif
+#endif
     return 0;
 }

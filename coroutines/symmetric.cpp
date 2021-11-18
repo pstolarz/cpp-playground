@@ -134,15 +134,10 @@ struct Result
          * its result object. Promise will be freed only in case the last result
          * object referenced to it is destroyed.
          */
-        std::suspend_always final_suspend() const {
+        std::suspend_always final_suspend() const noexcept {
             std::cout << "[" << (void*)this <<
                 "] Promise::final_suspend() [always]\n";
             return {};
-        }
-
-        void return_void() noexcept {
-            std::cout << "[" << (void*)this << "] Promise::return_void()\n";
-            _ret_code = 0;
         }
 
         void return_value(int ret_code) noexcept {

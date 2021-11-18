@@ -70,7 +70,7 @@ void coroutine_body(std::coroutine_handle<promise_t> handle)
         // coroutine body
         // co_await, co_yield and co_return are inlined as described below
     }
-    catch(...) {
+    catch (...) {
         promise.unhandled_exception();
     }
 
@@ -200,7 +200,7 @@ Basing on `gcc-10` [reverse engineered coroutine code](disasm/notes.disasm),
 following state machine:
 
 ```c++
-switch(handle.state)
+switch (handle.state)
 {
 // entry state
 case AWAIT_INITIAL:

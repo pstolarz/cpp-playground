@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-CXX=gcc-10
+CXX=gcc
 CXXFLAGS+=-Wall -fcoroutines --std=c++2a
 
 OBJS = \
