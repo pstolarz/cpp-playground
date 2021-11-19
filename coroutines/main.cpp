@@ -1,8 +1,8 @@
+#include <cassert>
 #include <coroutine>
 #include <exception>
 #include <iostream>
 #include <optional>
-#include <set>
 #include <stdexcept>
 
 // final_suspend() has been changed to noexcept for recent versions of
@@ -123,16 +123,14 @@ struct Result
         // supported since gcc-11
         // using enum RaiseExcept;
 
-        Promise() noexcept:
-            _ready(false), _suspend(true),
-            _rexcept(RaiseExcept::EXCEPT_NO), _results()
+        Promise() noexcept: _ready(false), _suspend(true)
         {
             std::cout << "Promise::Promise(); " << (void*)this << "\n";
         }
 
         Promise(bool ready, bool suspend,
             RaiseExcept rexcept = RaiseExcept::EXCEPT_NO) noexcept:
-            _ready(ready), _suspend(suspend), _rexcept(rexcept), _results()
+            _ready(ready), _suspend(suspend), _rexcept(rexcept)
         {
             std::cout << "Promise::Promise(); " << (void*)this << "\n";
         }
@@ -141,15 +139,16 @@ struct Result
             std::cout << "Promise::~Promise(); " << (void*)this << "\n";
 
             /*
-             * Inform associated objects about their promise removal.
+             * Inform associated object about its promise removal.
              * This step is required since the promise may be destroyed
-             * before result objects associated with it - this may occur
+             * before the result object associated with it - this may occur
              * if a coroutine is not suspended on its final stage and is
-             * terminated automatically (not by its lastly destroyed result
-             * object).
+             * terminated automatically (not by its result object's
+             * destructor).
              */
-            for (auto r: _results) { r->_promise = nullptr; }
-            _results.clear();
+            if (_result) _result->_promise = nullptr;
+
+            _destr_cnt++;
         }
 
         Awaitable<Promise> await_transform(int resume) const noexcept {
@@ -160,8 +159,9 @@ struct Result
         Yieldable<Promise> yield_value(int yield) const noexcept {
             std::cout << "Promise::yield_value()\n";
 
-            // inform associated objects about the yield code
-            for (auto r: _results) { r->_yield_code = yield; }
+            // inform associated object about the yield code
+            if (_result) _result->_yield_code = yield;
+
             return {yield};
         }
 
@@ -199,8 +199,8 @@ struct Result
         void return_value(int ret_code) noexcept {
             std::cout << "Promise::return_value()\n";
 
-            // inform associated objects about the return code
-            for (auto r: _results) { r->_ret_code = ret_code; }
+            // inform associated object about the return code
+            if (_result) _result->_ret_code = ret_code;
         }
 
         void unhandled_exception() {
@@ -210,11 +210,44 @@ struct Result
             std::rethrow_exception(std::current_exception());
         }
 
+        // coroutine handle object allocation
+        void *operator new(size_t sz) {
+            void *ptr = malloc(sz);
+            std::cout << "Promise::operator new(); " << ptr << "\n";
+
+            return ptr;
+        }
+
+        // coroutine handle object destruction
+        void operator delete(void *ptr) {
+            std::cout << "Promise::operator delete() " << ptr;
+
+            Promise& promise = Handle::from_address(ptr).promise();
+            if (promise._destr_cnt <= 1)
+            {
+                std::cout << "\n";
+
+                /*
+                 * Double free protection.
+                 *
+                 * NOTE: Raising an unhandled excpetion by a coroutine causes
+                 * compiler's call to std::coroutine_handle()::destroy() to free
+                 * coroutine resources. This leads to double free error caused
+                 * by Result::~Result() called first with the same destroy()
+                 * invocation.
+                 */
+                free(ptr);
+            } else {
+                std::cout << "; double-free detected\n";
+            }
+        }
+
     private:
         bool _ready;
         bool _suspend;
-        RaiseExcept _rexcept;
-        std::set<Result*> _results;
+        RaiseExcept _rexcept = RaiseExcept::EXCEPT_NO;
+        Result *_result = nullptr;
+        int _destr_cnt = 0;
 
     friend struct Result;
     };
@@ -230,8 +263,10 @@ struct Result
         std::cout << "Result::Result(); " << (void*)this << "\n";
 
         if (_promise) {
-            // bind the object with its promise
-            _promise->_results.insert(this);
+            // bind the object with its promise (it's assumed 1:1
+            // association between a result object and its promise)
+            assert(!_promise->_result);
+            _promise->_result = this;
         }
     }
 
@@ -240,11 +275,10 @@ struct Result
 
         if (_promise) {
             // unbind the object from its promise
-            _promise->_results.erase(this);
+            _promise->_result = nullptr;
 
-            // destroy promise if no more results are associated with it
-            if (_promise->_results.size() <= 0)
-                Handle::from_promise(*_promise).destroy();
+            // free coroutine handle
+            Handle::from_promise(*_promise).destroy();
         }
     }
 
@@ -276,7 +310,7 @@ struct Result
     }
 
 private:
-    // if null promise has been destroyed
+    // if NULL promise has been destroyed
     Promise *_promise;
 
     std::optional<int> _ret_code;
@@ -429,9 +463,8 @@ int main(void)
     // freed and the stack with coroutine result object is not unwinded:
     // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=95615
     //
-    // 2. gcc-11 seems to provide other bug in this context by double-freeing
-    // a promise object while an exception is raised.
-#if 0
+    // 2. Unhandled exceptions raised by coroutines require additional effort
+    // against double free issue - see Promise::operator delete() note.
     {
         std::cout << "\n--- exception in coroutine body\n";
         try {
@@ -459,7 +492,6 @@ int main(void)
             std::cout << "Exception: " << e.what() << "\n";
         }
     }
-#endif
 #endif
     return 0;
 }

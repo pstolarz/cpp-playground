@@ -94,6 +94,7 @@ struct Result
 
         ~Promise() noexcept {
             std::cout << "[" << (void*)this << "] Promise::~Promise()\n";
+            _destr_cnt++;
         }
 
         Awaitable<Promise> await_transform(Result& result) noexcept {
@@ -151,6 +152,24 @@ struct Result
             throw;
         }
 
+        // coroutine handle object allocation
+        void *operator new(size_t sz) {
+            void *ptr = malloc(sz);
+            std::cout << "Promise::operator new(); " << ptr << "\n";
+
+            return ptr;
+        }
+
+        // coroutine handle object destruction
+        void operator delete(void *ptr) {
+            std::cout << "Promise::operator delete() " << ptr << "\n";
+
+            Promise& promise = Handle::from_address(ptr).promise();
+            if (promise._destr_cnt <= 1) {
+                // double free protection
+                free(ptr);
+            }
+        }
     private:
         std::string _fname;
 
@@ -159,9 +178,10 @@ struct Result
 
         unsigned _ref_cnt = 0;
         int _ret_code = -1;
+        int _destr_cnt = 0;
 
-        friend struct Result;
-        friend struct Awaitable<Promise>;
+    friend struct Result;
+    friend struct Awaitable<Promise>;
     };
 
     using promise_type = Promise;
