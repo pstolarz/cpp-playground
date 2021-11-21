@@ -1,6 +1,10 @@
 ## Helper objects and functions
 
 * `promise`, `handle`: promise, coroutine handle associated with a coroutine.
+  Promise type is recognized by a compiler by `promise_type` type defined in
+  coroutine's return object class or by `promise_type` defined in
+  [`std::coroutine_traits`](https://en.cppreference.com/w/cpp/coroutine/coroutine_traits)
+  specialization for a given coroutine:
 
 * `awaitable`: result of applying `promise.await_transofrm()` on `co_await`
    expression.
@@ -38,7 +42,19 @@ result_t coroutine_entry(args...)
     // 1. promise_t::operator new(size);
     // 2. promise_t::operator new(size, args...);
     // 3. ::operator new(size);
+    //
+    // If static member promise_t::get_return_object_on_allocation_failure() is
+    // defined, no throwing variant of the above operator new() is called:
+    // 1. promise_t::operator new(size, std::nothrow);
+    // 2. promise_t::operator new(size, std::nothrow, args...);
+    // 3. ::operator new(size, std::nothrow);
+    //
+    // Allocation failure handling (one of):
+    // 1. std::bad_alloc exception.
+    // 2. Return object returned by promise_t::get_return_object_on_allocation_failure().
     std::coroutine_handle<promise_t> handle = alloc_coroutine_state(size, args...);
+
+    // Successful allocation is assumed hereafter.
 
     // Copy function parameters into the handle.
     handle.copy_args(args...);
