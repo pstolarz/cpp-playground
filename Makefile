@@ -5,6 +5,7 @@ CXXFLAGS+=-Wall --std=c++2a
 
 HEADERS = \
     refs.h \
+    forward_alt.h \
     templates_args.h \
     templates_spec.h \
     member_ptr.h \

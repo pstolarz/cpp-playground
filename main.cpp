@@ -45,6 +45,7 @@ ostream& operator<<(ostream& os, F B::*mp)
 } // std namespace
 
 #include "refs.h"
+#include "forward_alt.h"
 #include "templates_args.h"
 #include "templates_spec.h"
 #include "member_ptr.h"
@@ -59,6 +60,9 @@ int main(void)
 {
     std::cout << "\n--------- refs" << "\n";
     refs::test();
+
+    std::cout << "\n--------- forward_alt" << "\n";
+    forward_alt::test();
 
     std::cout << "\n--------- templates_args"  << "\n";
     templates_args::test();

@@ -1,5 +1,5 @@
-#ifndef __BIND_ALT_C17__
-#define __BIND_ALT_C17__
+#ifndef __BIND_ALT_C17_H__
+#define __BIND_ALT_C17_H__
 
 #include <cassert>
 #include <functional>

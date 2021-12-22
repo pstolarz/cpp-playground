@@ -1,5 +1,5 @@
-#ifndef __ALIGN_C17__
-#define __ALIGN_C17__
+#ifndef __ALIGN_C17_H__
+#define __ALIGN_C17_H__
 
 #include <cstddef>
 #include <cstdlib>
