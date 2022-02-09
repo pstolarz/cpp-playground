@@ -40,6 +40,23 @@ struct A {};
 void test()
 {
     /*
+     * Before f() gets called, the passed argument is decayed into int, then
+     * a matching function is selected basing on a character of the argument
+     * (prvalue, xvalue, lvalue etc.)
+     */
+    void f(int i);
+    void f(int& r);
+    void f(int&& rr);
+
+    /* ambiguous call: f(int), f(int&&) */
+    // f(0);        // prvalue
+    // f(int{0});   // xvalue
+
+    /* ambiguous call: f(int), f(int&) */
+    // int x = 0;
+    // f(x);        // lvalue
+
+    /*
      * NOTES:
      * 1. rvalue-ref initialization requires rvalue as an initializer. There
      * is not possible to initialize it with lvalue, only prvalue or xvalue
@@ -53,7 +70,7 @@ void test()
      * (which is equivalent to forwarding).
      *
      * As a conclusion proper usage of rvalue-ref variables requires careful
-     * handling via type forwardnig.
+     * handling via type forwarding.
      */
     int&& i = 0;    // prvalue
 
@@ -94,7 +111,7 @@ void test()
     /*
      * universal reference
      */
-    // OK: auto&& colapses to int& since i is decayed to int
+    // OK: auto&& collapses to int& since i is decayed to int
     auto&& ri1 = i;
     static_assert(
         std::is_same<decltype(ri1), int&>::value, "decltype(ri1) != int&");
