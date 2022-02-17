@@ -36,56 +36,56 @@ void test(void)
 {
     // object member test
     std::cout << "decltype(&C::a) == int C::* is " <<
-        std::is_same<decltype(&C::a), int C::*>::value << "\n",
+        std::is_same<decltype(&C::a), int C::*>::value << "\n",      // false
     std::cout << "decltype(&C::a) == int C::A::* == int A::* is " <<
-        (std::is_same<decltype(&C::a), int C::A::*>::value &&
-         std::is_same<decltype(&C::a), int A::*>::value) << "\n";
+        (std::is_same<decltype(&C::a), int C::A::*>::value &&        // true
+         std::is_same<decltype(&C::a), int A::*>::value) << "\n";    // true
 
     int C::*pmC = &C::a;
     std::cout << "decltype(pmC) == int C::* is " <<
-        std::is_same<decltype(pmC), int C::*>::value <<
+        std::is_same<decltype(pmC), int C::*>::value <<     // true
         "; pmC as &C::a value: " << pmC << "\n";
 
     int A::*pmA = &C::A::a;
     std::cout << "decltype(pmA) == int A::* is "<<
-        std::is_same<decltype(pmA), int A::*>::value <<
+        std::is_same<decltype(pmA), int A::*>::value <<     // true
         "; pmA as &C::A::a value: " << pmA << "\n";
 
     pmC = &C::b;
     std::cout << "decltype(pmC) == int C::* is " <<
-        std::is_same<decltype(pmC), int C::*>::value <<
+        std::is_same<decltype(pmC), int C::*>::value <<     // true
         "; pmC as &C::b value: " << pmC << "\n";
 
     int B::*pmB = &C::B::b;
     std::cout << "decltype(pmB) == int B::* is " <<
-        std::is_same<decltype(pmB), int B::*>::value <<
-        "; pmB as &C::B::b value: " << pmB << "\n";
+        std::is_same<decltype(pmB), int B::*>::value <<     // true
+        "; pmB as &C::B::b value: " << pmB << "\n";         // offset != 0
 
     // function member test
     std::cout << "\ndecltype(&C::fa) == int (C::*)() is " <<
-        std::is_same<decltype(&C::fa), int (C::*)()>::value << "\n",
+        std::is_same<decltype(&C::fa), int (C::*)()>::value << "\n",    // false
     std::cout << "decltype(&C::fa) == int (C::A::*)() == int (A::*)() is " <<
-        (std::is_same<decltype(&C::fa), int (C::A::*)()>::value &&
-         std::is_same<decltype(&C::fa), int (A::*)()>::value) << "\n";
+        (std::is_same<decltype(&C::fa), int (C::A::*)()>::value &&      // true
+         std::is_same<decltype(&C::fa), int (A::*)()>::value) << "\n";  // true
 
     int (C::*pfmC)() = &C::fa;
     std::cout << "decltype(pfmC) == int (C::*)() is " <<
-        std::is_same<decltype(pfmC), int (C::*)()>::value <<
+        std::is_same<decltype(pfmC), int (C::*)()>::value <<    // true
         "; pfmC as &C::fa value: " << pfmC << "\n";
 
     int (A::*pfmA)() = &C::A::fa;
     std::cout << "decltype(pfmA) == int (A::*)() is "<<
-        std::is_same<decltype(pfmA), int (A::*)()>::value <<
+        std::is_same<decltype(pfmA), int (A::*)()>::value <<    // true
         "; pfmA as &C::A::fa value: " << pfmA << "\n";
 
     pfmC = &C::fb;
     std::cout << "decltype(pfmC) == int (C::*)() is " <<
-        std::is_same<decltype(pfmC), int (C::*)()>::value <<
-        "; pfmC as &C::fb value: " << pfmC << "\n";
+        std::is_same<decltype(pfmC), int (C::*)()>::value <<    // true
+        "; pfmC as &C::fb value: " << pfmC << "\n";     // method offset != 0
 
     int (B::*pfmB)() = &C::B::fb;
     std::cout << "decltype(pfmB) == int (B::*)() is " <<
-        std::is_same<decltype(pfmB), int (B::*)()>::value <<
+        std::is_same<decltype(pfmB), int (B::*)()>::value <<    // true
         "; pfmB as &C::B::fb value: " << pfmB << "\n";
 }
 
